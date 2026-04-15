@@ -1,8 +1,8 @@
 # User Stories
 
-**Epic:**
+**Epic: Gosia testuje
 **Sprint:**
-**Date:** 4/13/2026
+**Date:** 4/15/2026
 
 ---
 
