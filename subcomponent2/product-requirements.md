@@ -5,7 +5,7 @@
 **Date:** 4/13/2026
 **Owner:**
 
-tu coś zmieniam dla przypału
+tu coś zmieniam dla przypału i jeszcze raz
 ---
 
 ## 1. Overview
