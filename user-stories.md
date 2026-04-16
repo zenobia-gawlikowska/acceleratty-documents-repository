@@ -19,6 +19,8 @@
 ### Story Points:
 ### Priority:
 
+ukryta podmianka
+
 ---
 
 ## Story 2: [Short Title]
