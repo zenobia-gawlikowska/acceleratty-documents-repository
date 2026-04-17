@@ -58,7 +58,7 @@ Jeśli decyzja:
 **→ PO decyduje szybko, z możliwością zmiany później.**
 
 ## 7. Szybkie retrospektywy
-Każdy ma prawo zawołać zwołać retrospektywę, której celem jest rozmowa o naszym sposobie pracy. 
+**Każdy ma prawo zawołać zwołać retrospektywę**, której celem jest rozmowa o naszym sposobie pracy. 
 
 Wszyscy przerywają wówczas pracę nad zadaniami aż uznamy, że temat jest zaadresowany.
 
