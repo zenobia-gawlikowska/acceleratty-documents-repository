@@ -12,7 +12,7 @@ Każda istotna zmiana w artefakcie:
 Musi być widoczna w AcceleraTTy
 Nie zakładamy, że „inni się domyślą”
 
-Zmiana jest zaproszeniem do reakcji, nie oskarżeniem. 
+**Zmiana jest zaproszeniem do reakcji, nie oskarżeniem.** 
 
 Czas pracy dzielimy na 'rozmowę' i 'skupienie'. 'Skupienie' trwa 30 minut - i wówczas nie informujemy się o zmianach, żeby się nie rozpraszać. Po 30 minutach synchronizujemy się odpowiadając na pytania: 
 - czy odkryłem/odkryłam coś nowego?
@@ -57,5 +57,7 @@ Jeśli decyzja:
 **→ PO decyduje szybko, z możliwością zmiany później.**
 
 ## 7. Szybkie retrospektywy
-Każdy ma prawo zawołać zwołać retrospektywę, której celem jest rozmowa o naszym sposobie pracy. Wszyscy przerywają wówczas pracę nad zadaniami aż uznamy, że temat jest zaadresowany.
+Każdy ma prawo zawołać zwołać retrospektywę, której celem jest rozmowa o naszym sposobie pracy. 
+
+Wszyscy przerywają wówczas pracę nad zadaniami aż uznamy, że temat jest zaadresowany.
 
