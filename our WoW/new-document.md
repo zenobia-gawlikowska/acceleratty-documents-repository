@@ -1,10 +1,11 @@
 # our WoW
 Kontrakt współpracy na hackathon 
-1. Artefakt > rola
+
+## 1. Artefakt > rola
 
 Pracujemy na wspólnych artefaktach, nie „swoich kawałkach”. Każdy może odnieść się do każdego artefaktu (story, Figma, test, kod), jeśli widzi niespójność.
 
-2. Zmiana = sygnał
+## 2. Zmiana = sygnał
 
 Każda istotna zmiana w artefakcie:
 
@@ -17,20 +18,20 @@ Czas pracy dzielimy na 'rozmowę' i 'skupienie'. 'Skupienie' trwa 30 minut - i w
 1) czy odkryłem/odkryłam coś nowego?
 2) czy zmieniłem któryś artefakt? jeśli tak, jakie to może mieć znaczenie na pracę pozostałych?
 
-3. Nie czekamy na „handoff”
+## 3. Nie czekamy na „handoff”
 
 Designerki ≠ „przed devem”
 Test ≠ „na końcu”
 Pracujemy równolegle, nawet na niepełnych danych.
 
 
-4. Niejasność = bug
+## 4. Niejasność = bug
 
 Brak decyzji, sprzeczność, luka → traktujemy jak defekt
 Każdy ma prawo (i obowiązek) go zgłosić, niezależnie od roli.
 
 
-5. Jedno źródło prawdy
+## 5. Jedno źródło prawdy
 
 Jeśli coś jest:
 
@@ -42,7 +43,7 @@ tylko „na Slacku”
 Prawda żyje w artefaktach (story / Figma / test / kod).
 
 
-6. Szybkie domykanie decyzji
+## 6. Szybkie domykanie decyzji
 W przypadku odrębnych zdań decydujemy głosowaniem.
 
 Hackathon ≠ perfekcja
@@ -52,6 +53,6 @@ blokuje innych
 nie jest krytyczna jakościowo
 → PO decyduje szybko, z możliwością zmiany później.
 
-7. Szybkie retrospektywy
+## 7. Szybkie retrospektywy
 Każdy ma prawo zawołać zwołać retrospektywę, której celem jest rozmowa o naszym sposobie pracy. Wszyscy przerywają wówczas pracę nad zadaniami aż uznamy, że temat jest zaadresowany.
 
