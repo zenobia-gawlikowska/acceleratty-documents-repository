@@ -1,4 +1,5 @@
-# our WoW
+# Our Ways of Working
+
 Kontrakt współpracy na hackathon 
 
 ## 1. Artefakt > rola
