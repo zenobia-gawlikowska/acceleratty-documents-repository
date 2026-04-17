@@ -15,43 +15,46 @@ Nie zakładamy, że „inni się domyślą”
 Zmiana jest zaproszeniem do reakcji, nie oskarżeniem. 
 
 Czas pracy dzielimy na 'rozmowę' i 'skupienie'. 'Skupienie' trwa 30 minut - i wówczas nie informujemy się o zmianach, żeby się nie rozpraszać. Po 30 minutach synchronizujemy się odpowiadając na pytania: 
-1) czy odkryłem/odkryłam coś nowego?
-2) czy zmieniłem któryś artefakt? jeśli tak, jakie to może mieć znaczenie na pracę pozostałych?
+- czy odkryłem/odkryłam coś nowego?
+- czy zmieniłem któryś artefakt? jeśli tak, jakie to może mieć znaczenie na pracę pozostałych?
 
 ## 3. Nie czekamy na „handoff”
 
 Designerki ≠ „przed devem”
-Test ≠ „na końcu”
-Pracujemy równolegle, nawet na niepełnych danych.
 
+Test ≠ „na końcu”
+
+**Pracujemy równolegle, nawet na niepełnych danych.**
 
 ## 4. Niejasność = bug
 
 Brak decyzji, sprzeczność, luka → traktujemy jak defekt
-Każdy ma prawo (i obowiązek) go zgłosić, niezależnie od roli.
 
+**Każdy ma prawo (i obowiązek) go zgłosić, niezależnie od roli.**
 
 ## 5. Jedno źródło prawdy
 
 Jeśli coś jest:
 
-tylko w głowie
-tylko na callu
-tylko „na Slacku”
+- tylko w głowie
+- tylko na callu
+- tylko „na Slacku”
 
 → nie istnieje
-Prawda żyje w artefaktach (story / Figma / test / kod).
 
+**Prawda żyje w artefaktach (story / Figma / test / kod).**
 
 ## 6. Szybkie domykanie decyzji
 W przypadku odrębnych zdań decydujemy głosowaniem.
 
 Hackathon ≠ perfekcja
+
 Jeśli decyzja:
 
-blokuje innych
-nie jest krytyczna jakościowo
-→ PO decyduje szybko, z możliwością zmiany później.
+- blokuje innych
+- nie jest krytyczna jakościowo
+
+**→ PO decyduje szybko, z możliwością zmiany później.**
 
 ## 7. Szybkie retrospektywy
 Każdy ma prawo zawołać zwołać retrospektywę, której celem jest rozmowa o naszym sposobie pracy. Wszyscy przerywają wówczas pracę nad zadaniami aż uznamy, że temat jest zaadresowany.
