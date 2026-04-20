@@ -1,2 +1,0 @@
-# testGosia2
-
