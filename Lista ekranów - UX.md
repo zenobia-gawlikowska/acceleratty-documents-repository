@@ -1,8 +1,6 @@
 # Lista widoków - UX
 
-1. Widok pusty
-a. żadnych zadań dziś/ w najbliższym tygodniu
-b. wszystkie zadania wykonane
+1. Widok pusty - brak zadań
 2. Widok przeglądania perspektywy krótkiej (dziś-jutro)
 3. Widok przeglądania perspektywy długiej (następny tydzień)
 4. Filtrowanie i sortowanie zdarzeń
@@ -14,3 +12,4 @@ d. typ zdarzenia (klasówka, karktówka, praca domowa)
 a. przedmiot
 b. opis lub jego fragment
 6. Wykonanie zadania → zmiana statusu i odświeżenie listy
+7. Archiwum wykonanych zadań
