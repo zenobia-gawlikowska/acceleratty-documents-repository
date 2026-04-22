@@ -4,13 +4,15 @@ Kontrakt współpracy na hackathon
 
 ## 1. Artefakt > rola
 
-Pracujemy na wspólnych artefaktach, nie „swoich kawałkach”. Każdy może odnieść się do każdego artefaktu (story, Figma, test, kod), jeśli widzi niespójność.
+Pracujemy na wspólnych artefaktach, nie „swoich kawałkach”. Każdy może odnieść się do każdego artefaktu (story, Figma, test, kod), jeśli widzi niespójność, pomysł na ulepszenie, potrzebę dodania czegoś etc.
 
 ## 2. Zmiana = sygnał
 
 Każda istotna zmiana w artefakcie:
+- wszystkie zmiany w designie są istotne (poza kosmetycznymi typu zmiana paddingu)
+- zmiana w kodzie/test case nie jest istotną zmianą
 
-Musi być widoczna w AcceleraTTy
+Musi być widoczna w AcceleraTTy.
 Jest ogłoszona przez autora na kanale slackowym w wątku 'ZMIANY'
 
 Czas pracy dzielimy na 'rozmowę' i 'skupienie'. 'Skupienie' trwa 30 minut - i wówczas nie informujemy się o zmianach, żeby się nie rozpraszać. Po 30 minutach synchronizujemy się odpowiadając na pytania: 
