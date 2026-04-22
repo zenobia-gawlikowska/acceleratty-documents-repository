@@ -34,6 +34,10 @@ Brak decyzji, sprzeczność, luka → traktujemy jak defekt
 
 **Każdy ma prawo (i obowiązek) go zgłosić, niezależnie od roli.**
 
+**Defekty zgłaszamy od razu (na Slacku i Miro)**
+- Slack:  w wątku bugi (pierwsza osoba, która znajdzie bug, zakłada wątek)
+-  Miro: jako komentarz do zadania
+
 ## 5. Jedno źródło prawdy
 
 Jeśli coś jest:
