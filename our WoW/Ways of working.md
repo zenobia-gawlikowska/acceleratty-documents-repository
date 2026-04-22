@@ -31,6 +31,7 @@ Test ≠ „na końcu”
 Brak decyzji, sprzeczność, luka → traktujemy jak defekt
 
 **Każdy ma prawo (i obowiązek) go zgłosić, niezależnie od roli.**
+
 **Defekty zgłaszamy od razu (na Slacku i Miro?)** 
 
 ## 5. Jedno źródło prawdy
