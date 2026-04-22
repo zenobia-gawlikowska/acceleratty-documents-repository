@@ -8,6 +8,7 @@ a. przedmiot
 b. trudność
 c. data
 d. typ zdarzenia (klasówka, karktówka, praca domowa)
+e. status
 5. Wyszukiwanie zdarzeń (tekstowe)
 a. przedmiot
 b. opis lub jego fragment
