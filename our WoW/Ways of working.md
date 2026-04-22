@@ -61,3 +61,5 @@ Jeśli decyzja:
 
 Wszyscy przerywają wówczas pracę nad zadaniami aż uznamy, że temat jest zaadresowany.
 
+## 8. Pain points
+Zbieramy pain pointy i gain pointy - momenty procesu, w których czujemy się inaczej niż w standardowym procesie.
