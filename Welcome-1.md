@@ -1,4 +1,4 @@
-# Welcome to Acceleratty
+# Welcome to AcceleraTTy
 
 Start creating your documents here.
 
