@@ -1,102 +1,136 @@
 # Suggested SLSD components
 
-Based on the transcript, the product is a student dashboard for managing assignments, tests, and study materials with:
-- Visual representation of "what, when, from which subject"
-- Time perspectives (today / this week / longer)
-- Subject differentiation (color + icon coding)
-- Cards per event/assignment (expandable to show material)
-- Progress tracking (% of week prepared)
-- Mobile-friendly, accessible (neurodivergent-friendly)
-- Filtering
+## How the narrowed components combine into the student study dashboard
 
+Using only the 15 components the designers approved: **Button, Button bar, Toggle button, Date picker, Badge, Progress bar, Search field, Select, Card, Panel, Avatar, Icon, Tabs, Overlay (Popover), Tooltip.**
 
-## Component recommendations for the student study dashboard
+---
 
-Based on the refinement, the product needs a **visual, mobile-friendly dashboard** that shows students *what* to study, *when*, and *from which subject*, with color/icon subject coding, time horizons (today / week / longer), per-assignment cards expandable to learning material, filtering, and progress tracking — plus neurodivergent-friendly UX.
+### 1. Page-level layout — "What's on my plate"
 
-### Primary (core building blocks for the dashboard)
+**`Tabs`** drives the time horizon at the top of the dashboard:
+`Dziś` · `Tydzień` · `Miesiąc`
 
-| # | Component | Role in the product |
-|---|-----------|---------------------|
-| 1 | card.png — **Card** (stable)  | The main "event card": one per sprawdzian/kartkówka/lektura. Can hold image/icon, title, tag, description, primary action ("Ucz się teraz"). This is the heart of the dashboard. |
-| 2 | panel.png — **Panel** (draft) | Wraps grouped sections ("Dziś", "Ten tydzień", "Później"). With title + action slot. |
-| 3 | accordion.png — **Accordion** (stable) | Collapsible grouping by day or by subject; perfect for "zjedziałość" — expand only what's now. |
-| 4 | tabs.png — **Tabs** (stable) | Switch the time horizon: *Dziś / Tydzień / Miesiąc*. |
-| 5 | progress-bar.png — **Progress bar** (preview) | "Jak bardzo jesteś przygotowany na ten tydzień" — % done per subject or overall. Strong stress-reduction signal. |
+Each tab hosts a stack of **`Panel`**s, one per day or per subject group (e.g. "Poniedziałek", "Wtorek", or "Matematyka", "Historia"). `Panel` is collapsible, which supports the "pokaż tylko to, co teraz" need for neurodivergent users.
 
-### Supporting (semantic / visual encoding)
+Inside each `Panel` content slot → a grid of **`Card`**s, one per assignment/test/lektura.
 
-| # | Component | Role |
-|---|-----------|------|
-| 6 | tag-list.png — **Tag / Tag list** (preview) | Color-coded subject labels (matematyka, historia, polski…) — exactly the "kolor + ikona per przedmiot" requirement. |
-| 7 | badge.png — **Badge** (stable) | Small status indicator: "nowe", "jutro", "pilne", or a count of items per day. |
-| 8 | callout.png — **Callout** (preview) | Strong "here and now" message: "Masz sprawdzian jutro — zacznij teraz". |
-| 9 | inline-message.png — **Inline message** (stable) | Dismissable reminders inside a card/panel ("Materiał zaktualizowany przez nauczyciela"). |
-| 10 | checkbox.png — **Checkbox** (stable) | Mark a subtask / flashcard / topic as "opanowane". Feeds the progress bar. |
+---
 
-### Optional (filter / detail / hierarchy)
+### 2. The event `Card` — the atomic unit
 
-- **Tree** (tree.png, preview) — if you want to break a big topic into subtopics ("Rozbiory → I rozbiór, II rozbiór…") that the student (or the tool) can split.
-- **Select / Combobox** — filter by subject.
-- **Search field** — find a topic or flashcard.
-- **Dialog / Drawer** — open full card details on mobile (drawer is especially good on phones).
-- **Avatar / Icon** — subject avatar/icon inside cards and tags.
-- **Tooltip** — hints, since the audience includes neurodivergent users.
-- **Button / Button bar** — actions: "Ucz się", "Podziel materiał", "Oznacz jako gotowe".
+Every sprawdzian / kartkówka / lektura is a `Card` composed of:
 
-### Suggested dashboard composition
-- `sl-tabs` (Dziś / Tydzień / Miesiąc)
-  - `sl-panel` "Dziś" → grid of `sl-card`s, each with `sl-tag` (subject), `sl-badge` (priority), `sl-progress-bar` (how much of this material done), `sl-checkbox` list for subtopics
-  - `sl-accordion` "Później" grouped by day
-- Top-level `sl-callout` for the most urgent item
-- `sl-progress-bar` at the top = "Przygotowanie na ten tydzień: 35%"
+- **`Avatar`** (square variant) or **`Icon`** on the left — the subject's visual identity (color + symbol for matematyka, historia, polski…). Solves the "uczeń musi odróżnić przedmioty" requirement.
+- **`Badge`** next to the title — status/priority: `Jutro`, `Pilne`, `Nowe`, or a numeric countdown ("za 2 dni").
+- **Title + short description** (the "co" and "z czego").
+- **`Progress bar`** inside the card footer — how much of this topic the student has already covered ("3 z 5 tematów opanowanych"). This is the anti-stress signal.
+- **`Button bar`** at the bottom with the primary **`Button`** ("Ucz się teraz") and secondary buttons ("Podziel materiał", "Oznacz jako gotowe").
 
-All screenshots are saved in the workspace root (card.png, panel.png, accordion.png, tabs.png, progress-bar.png, tag-list.png, badge.png, callout.png, inline-message.png, checkbox.png, tree.png).
+---
+
+### 3. Global dashboard header
+
+Above the `Tabs`:
+
+- Large **`Progress bar`** = "Przygotowanie na ten tydzień: 35%" (the headline metric from the refinement: *"ile z tego, co miałaś zaplanowane na ten tydzień, zrobiłaś"*).
+- **`Avatar`** of the logged-in student (top-right), opening a profile **`Popover`**.
+
+---
+
+### 4. Filtering & navigation bar
+
+A second row of controls, below the header:
+
+- **`Search field`** — "znajdź temat / fiszkę / przedmiot".
+- **`Select`** — filter by subject (matematyka, historia, …). With the icons slot, options carry the same subject `Icon` used in cards.
+- **`Date picker`** — jump to a specific day; also used in "Planner" view to set custom deadlines when the student splits a big topic.
+- **`Toggle button`** group (acting as view switcher): `Lista` / `Kalendarz` / `Tablica`. Also used as a subject-pill filter row ("Pokaż tylko: Matematyka · Historia · Polski") — each pill is a `Toggle button` with subject `Icon`.
+
+---
+
+### 5. Progressive disclosure — details without leaving the page
+
+Clicking a `Card` opens a **`Popover`** (the "Overlay" from the designers' list) anchored to the card. It holds:
+
+- Full description of the material.
+- A nested **`Progress bar`** per subtopic.
+- A **`Button bar`** with "Rozpocznij naukę", "Podziel na części", "Przełóż termin" (opens an inline `Date picker`).
+
+This keeps the mobile-first constraint — no route change, no modal takeover.
+
+---
+
+### 6. Helpful hints everywhere
+
+**`Tooltip`** wraps every icon-only control (the `Toggle button` subject pills, icon-only `Button`s in the `Button bar`, subject `Avatar`s). The refinement specifically called out accessibility and clarity for neurodivergent students — tooltips carry the labels for icon-only UI.
+
+**`Badge`** is also placed on navigation/tab labels to show counts: `Dziś (3)`, `Tydzień (11)`.
+
+---
+
+### 7. Concrete wiring (ASCII sketch)
+
+```
+┌─ Header ─────────────────────────────────────────────┐
+│ [Avatar]  Cześć, Ada!       [Progress bar 35%]       │
+├─ Toolbar ────────────────────────────────────────────┤
+│ [Search field]  [Select: Przedmiot]  [Date picker]   │
+│ [Toggle button group: Lista | Kalendarz | Tablica]   │
+├─ Tabs ───────────────────────────────────────────────┤
+│  Dziś(3)  Tydzień(11)  Miesiąc(27)                   │
+├─ Panel "Dziś" ───────────────────────────────────────┤
+│  ┌ Card ─────────────────────────────────────────┐   │
+│  │ [Avatar HIST] Konfederacja barska  [Badge ⚠]  │   │
+│  │ Sprawdzian · jutro 8:00                       │   │
+│  │ [Progress bar 2/5]                            │   │
+│  │ [Button bar: Ucz się | Podziel | Gotowe (?) ] │   │
+│  └───────────────────────────────────────────────┘   │
+│  ┌ Card ──────────────────────────── ... ─────── ┐   │
+│                                                      │
+│     (Click a Card → Popover with details +          │
+│      Date picker to reschedule + Button bar)        │
+└──────────────────────────────────────────────────────┘
+```
+
+---
+
+### Coverage check against the refinement needs
+
+| Refinement need | Covered by |
+|---|---|
+| Wizualne pokazanie "co na kiedy" | `Tabs` + `Panel` + `Card` |
+| Różne przedmioty = kolor + ikona | `Avatar` / `Icon` + `Select` with icons + `Toggle button` pills |
+| Priorytet / pilność | `Badge` on cards and tabs |
+| "Tu i teraz" vs planowanie na tydzień | `Tabs` (Dziś/Tydzień/Miesiąc) |
+| % przygotowania, anti-stress | `Progress bar` (global + per card) |
+| Podział dużego materiału na części | Action in card's `Button bar` → `Popover` with `Date picker` |
+| Szybkie znalezienie tematu | `Search field` + `Select` |
+| Mobile-friendly, bez pełnych modali | `Popover` zamiast dialogu |
+| Dostępność / neurodivergent | `Tooltip` wszędzie na icon-only, kolapsujące `Panel` |
 
 ## Screenshots
 
-### Card
+### Button
 
-![screenshot-20260422191844293](/api/file/raw?path=screenshot-20260422191844293.png)
+![screenshot-20260422193004515](/api/file/raw?path=screenshot-20260422193004515.png)
 
-### Panel
+### Button Bar
 
-![screenshot-20260422191918304](/api/file/raw?path=screenshot-20260422191918304.png)
+![screenshot-20260422193104944](/api/file/raw?path=screenshot-20260422193104944.png)
 
-### Accordion
+### Toggle Button
 
-![screenshot-20260422191945649](/api/file/raw?path=screenshot-20260422191945649.png)
+![screenshot-20260422193127434](/api/file/raw?path=screenshot-20260422193127434.png)
 
-### Tabs
+### Date Picker
 
-![screenshot-20260422192009933](/api/file/raw?path=screenshot-20260422192009933.png)
-
-### Progress Bar
-
-![screenshot-20260422192030881](/api/file/raw?path=screenshot-20260422192030881.png)
-
-### Tag list
-
-![screenshot-20260422192056439](/api/file/raw?path=screenshot-20260422192056439.png)
+![screenshot-20260422193153507](/api/file/raw?path=screenshot-20260422193153507.png)
 
 ### Badge
 
-![screenshot-20260422192136123](/api/file/raw?path=screenshot-20260422192136123.png)
+![screenshot-20260422193208042](/api/file/raw?path=screenshot-20260422193208042.png)
 
-### Callout
+### Progress Bar
 
-![screenshot-20260422192201886](/api/file/raw?path=screenshot-20260422192201886.png)
-
-### Inline Message
-
-
-![screenshot-20260422192228291](/api/file/raw?path=screenshot-20260422192228291.png)
-
-### Checkbox
-
-
-![screenshot-20260422192245606](/api/file/raw?path=screenshot-20260422192245606.png)
-
-### Tree 
-
-![screenshot-20260422192326940](/api/file/raw?path=screenshot-20260422192326940.png)
+![screenshot-20260422193232002](/api/file/raw?path=screenshot-20260422193232002.png)
