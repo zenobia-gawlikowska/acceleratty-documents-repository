@@ -11,13 +11,12 @@ Pracujemy na wspólnych artefaktach, nie „swoich kawałkach”. Każdy może o
 Każda istotna zmiana w artefakcie:
 
 Musi być widoczna w AcceleraTTy
-Nie zakładamy, że „inni się domyślą”
-
-**Zmiana jest zaproszeniem do reakcji, nie oskarżeniem.** 
+Jest ogłoszona przez autora na kanale slackowym w wątku 'ZMIANY'
 
 Czas pracy dzielimy na 'rozmowę' i 'skupienie'. 'Skupienie' trwa 30 minut - i wówczas nie informujemy się o zmianach, żeby się nie rozpraszać. Po 30 minutach synchronizujemy się odpowiadając na pytania: 
 - czy odkryłem/odkryłam coś nowego?
 - czy zmieniłem któryś artefakt? jeśli tak, jakie to może mieć znaczenie na pracę pozostałych?
+- czas do konca skupienia odmierzany jest na miro
 
 ## 3. Nie czekamy na „handoff”
 
