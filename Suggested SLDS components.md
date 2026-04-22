@@ -134,3 +134,42 @@ This keeps the mobile-first constraint — no route change, no modal takeover.
 ### Progress Bar
 
 ![screenshot-20260422193232002](/api/file/raw?path=screenshot-20260422193232002.png)
+
+### Search Bar
+
+![screenshot-20260422193835370](/api/file/raw?path=screenshot-20260422193835370.png)
+
+### Select
+
+![screenshot-20260422193924239](/api/file/raw?path=screenshot-20260422193924239.png)
+
+### Card
+
+
+![screenshot-20260422193951677](/api/file/raw?path=screenshot-20260422193951677.png)
+
+### Panel
+
+![screenshot-20260422193939631](/api/file/raw?path=screenshot-20260422193939631.png)
+
+### Avatar
+
+![screenshot-20260422194014802](/api/file/raw?path=screenshot-20260422194014802.png)
+
+### Icon
+
+![screenshot-20260422194034149](/api/file/raw?path=screenshot-20260422194034149.png)
+
+### Tabs
+
+![screenshot-20260422194235790](/api/file/raw?path=screenshot-20260422194235790.png)
+
+### Popover
+
+![screenshot-20260422194108334](/api/file/raw?path=screenshot-20260422194108334.png)
+
+### Tooltip
+
+
+![screenshot-20260422194328239](/api/file/raw?path=screenshot-20260422194328239.png)
+
