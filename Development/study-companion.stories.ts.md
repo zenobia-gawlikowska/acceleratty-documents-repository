@@ -1,22 +1,14 @@
 import {
   faBook,
   faCalculator,
-  faCalendarDays,
-  faCheck,
-  faChevronRight,
-  faFilter,
+  faFilePen,
   faFlask,
   faGlobe,
+  faHeadSideSpeak,
   faPalette,
-  faPlus
+  faPenField,
+  faTimer
 } from '@fortawesome/pro-regular-svg-icons';
-import {
-  faBook as fasBook,
-  faCalculator as fasCalculator,
-  faFlask as fasFlask,
-  faGlobe as fasGlobe,
-  faPalette as fasPalette
-} from '@fortawesome/pro-solid-svg-icons';
 import '@sl-design-system/avatar/register.js';
 import '@sl-design-system/badge/register.js';
 import '@sl-design-system/button/register.js';
@@ -26,33 +18,13 @@ import { Icon } from '@sl-design-system/icon';
 import '@sl-design-system/icon/register.js';
 import '@sl-design-system/listbox/register.js';
 import '@sl-design-system/panel/register.js';
-import '@sl-design-system/popover/register.js';
-import '@sl-design-system/progress-bar/register.js';
 import '@sl-design-system/search-field/register.js';
 import '@sl-design-system/select/register.js';
-import '@sl-design-system/tabs/register.js';
-import '@sl-design-system/toggle-button/register.js';
 import '@sl-design-system/tooltip/register.js';
 import { type StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 
-Icon.register(
-  faBook,
-  faCalculator,
-  faCalendarDays,
-  faCheck,
-  faChevronRight,
-  faFilter,
-  faFlask,
-  faGlobe,
-  faPalette,
-  faPlus,
-  fasBook,
-  fasCalculator,
-  fasFlask,
-  fasGlobe,
-  fasPalette
-);
+Icon.register(faBook, faCalculator, faFilePen, faFlask, faGlobe, faHeadSideSpeak, faPalette, faPenField, faTimer);
 
 type Story = StoryObj;
 
@@ -86,8 +58,8 @@ const subjects: Subject[] = [
 
 const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
   {
-    dayLabel: 'Monday',
-    dateLabel: 'Apr 27',
+    dayLabel: 'Today',
+    dateLabel: 'Thursday (23/04/2026)',
     tasks: [
       {
         id: 'm1',
@@ -102,7 +74,7 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
       },
       {
         id: 'h1',
-        title: 'Partitions of Poland — essay outline',
+        title: 'Partitions of Poland — written assignment',
         subject: subjects[1],
         due: 'today',
         durationMin: 45,
@@ -114,12 +86,12 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
     ]
   },
   {
-    dayLabel: 'Tuesday',
-    dateLabel: 'Apr 28',
+    dayLabel: 'Tomorrow',
+    dateLabel: 'Friday (24/04/2026)',
     tasks: [
       {
         id: 's1',
-        title: 'Cell biology — flashcards review',
+        title: 'Cell biology — exam',
         subject: subjects[2],
         due: 'tomorrow',
         durationMin: 30,
@@ -131,14 +103,14 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
     ]
   },
   {
-    dayLabel: 'Wednesday',
-    dateLabel: 'Apr 29',
+    dayLabel: 'Saturday',
+    dateLabel: 'Saturday (25/04/2026)',
     tasks: [
       {
         id: 'g1',
-        title: 'Map quiz — European capitals',
+        title: 'European capitals — oral exam',
         subject: subjects[3],
-        due: 'Apr 29',
+        due: '25/04/2026',
         durationMin: 30,
         priority: 'high',
         status: 'todo',
@@ -147,9 +119,9 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
       },
       {
         id: 'a1',
-        title: 'Impressionism — bring portfolio',
+        title: 'Impressionism — written assignment',
         subject: subjects[4],
-        due: 'Apr 29',
+        due: '25/04/2026',
         durationMin: 20,
         priority: 'low',
         status: 'done',
@@ -159,14 +131,14 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
     ]
   },
   {
-    dayLabel: 'Thursday',
-    dateLabel: 'Apr 30',
+    dayLabel: 'Monday',
+    dateLabel: 'Monday (27/04/2026)',
     tasks: [
       {
         id: 'm2',
-        title: 'Fractions — worksheet',
+        title: 'Fractions — test',
         subject: subjects[0],
-        due: 'Apr 30',
+        due: '27/04/2026',
         durationMin: 45,
         priority: 'normal',
         status: 'todo',
@@ -174,11 +146,6 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
         note: 'Worksheet from Mr. Nowak — questions 1 to 15, show your working for the tricky ones.'
       }
     ]
-  },
-  {
-    dayLabel: 'Friday',
-    dateLabel: 'May 1',
-    tasks: []
   }
 ];
 
@@ -218,15 +185,32 @@ const typeOf = (task: Task) => {
   const type = parts.slice(1).join(' — ').trim();
   return type.charAt(0).toUpperCase() + type.slice(1);
 };
+// Icon per event-type category (shown next to the title in the panel prefix).
+// Unknown types fall back to the task's subject icon.
+const eventTypeIcons: Record<string, string> = {
+  exam: 'far-pen-field',
+  test: 'far-timer',
+  'oral-exam': 'far-head-side-speak',
+  'written-assignment': 'far-file-pen'
+};
+
 const topicSlug = (topic: string) =>
   topic
     .toLowerCase()
     .replaceAll(/[^a-z0-9]+/g, '-')
     .replaceAll(/^-|-$/g, '');
 
-const allTopics: Array<{ slug: string; label: string }> = Array.from(
-  new Map(week.flatMap(d => d.tasks.map(t => [topicSlug(topicOf(t)), topicOf(t)] as const))).entries()
+const allEventTypes: Array<{ slug: string; label: string }> = Array.from(
+  new Map(
+    week.flatMap(d =>
+      d.tasks.map(t => {
+        const label = typeOf(t);
+        return [topicSlug(label), label] as const;
+      })
+    )
+  ).entries()
 )
+  .filter(([slug]) => slug !== '')
   .map(([slug, label]) => ({ slug, label }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
@@ -244,76 +228,73 @@ const taskAction = (task: Task) => {
   `;
 };
 
-const taskPanel = (task: Task) => html`
-  <sl-panel
-    class="task-panel"
-    data-subject=${task.subject.label}
-    data-subject-key=${task.subject.key}
-    data-priority=${task.priority}
-    data-topic=${topicSlug(topicOf(task))}
-    divider
-  >
-    <sl-icon slot="prefix" name=${task.subject.iconName}></sl-icon>
-    <div slot="heading" class="task-heading">
-      <span class="task-heading__title">${topicOf(task)}</span>
-      <span class="task-heading__subtitle">${typeOf(task)}${spice(task.priority)}</span>
-    </div>
-    <span slot="aside" class="task-aside">${statusBadge(task.status)}</span>
+const taskPanel = (task: Task) => {
+  const typeSlug = topicSlug(typeOf(task));
+  const prefixIcon = eventTypeIcons[typeSlug] ?? task.subject.iconName;
 
-    <div style="display: grid; gap: 1rem;">
-      <div style="display: grid; gap: 0.5rem;">
-        <p style="margin: 0;">
-          <sl-icon name=${task.subject.iconName} style="vertical-align: -0.15em;"></sl-icon>
-          ${task.subject.label}
-        </p>
-        ${task.note ? html`<p style="margin: 0;">${task.note}</p>` : null}
+  return html`
+    <sl-panel
+      class="task-panel"
+      data-subject=${task.subject.label}
+      data-subject-key=${task.subject.key}
+      data-priority=${task.priority}
+      data-status=${task.status}
+      data-topic=${topicSlug(topicOf(task))}
+      data-type=${typeSlug}
+      divider
+    >
+      <sl-icon slot="prefix" name=${prefixIcon}></sl-icon>
+      <div slot="heading" class="task-heading">
+        <span class="task-heading__title">${topicOf(task)}</span>
+        <span class="task-heading__subtitle">${typeOf(task)}${spice(task.priority)}</span>
       </div>
+      <span slot="aside" class="task-aside">${statusBadge(task.status)}</span>
 
-      <sl-button-bar align="end"> ${taskAction(task)} </sl-button-bar>
-    </div>
-  </sl-panel>
-`;
+      <div style="display: grid; gap: 1rem;">
+        <div style="display: grid; gap: 0.5rem;">
+          <p style="margin: 0;">
+            <sl-icon name=${task.subject.iconName} style="vertical-align: -0.15em;"></sl-icon>
+            ${task.subject.label}
+          </p>
+          ${task.note ? html`<p style="margin: 0;">${task.note}</p>` : null}
+        </div>
 
-const dayPanel = (day: (typeof week)[number]) => html`
-  <sl-panel heading=${`${day.dayLabel} · ${day.dateLabel}`}>
-    <sl-badge slot="prefix" size="sm" color="neutral">${day.tasks.length}</sl-badge>
-    <sl-tooltip slot="actions" id=${`tt-add-${day.dayLabel}`} position="top"
-      >Add something for ${day.dayLabel}</sl-tooltip
-    >
-    <sl-button
-      slot="actions"
-      fill="ghost"
-      shape="pill"
-      aria-label=${`Add something for ${day.dayLabel}`}
-      aria-describedby=${`tt-add-${day.dayLabel}`}
-    >
-      <sl-icon name="far-plus"></sl-icon>
-    </sl-button>
+        <sl-button-bar align="end"> ${taskAction(task)} </sl-button-bar>
+      </div>
+    </sl-panel>
+  `;
+};
 
-    ${day.tasks.length === 0
-      ? html`<p style="margin: 0; color: var(--sl-color-foreground-muted);">No tasks planned.</p>`
-      : html`<div style="display: grid; gap: 1.5rem;">${day.tasks.map(taskPanel)}</div>`}
-  </sl-panel>
-`;
+const daySection = (day: (typeof week)[number]) =>
+  day.tasks.length === 0
+    ? null
+    : html`
+        <section class="day-section" data-day=${day.dayLabel}>
+          <header class="day-section__header">
+            <span class="day-section__label">${day.dayLabel}</span>
+            <span class="day-section__date">${day.dateLabel}</span>
+          </header>
+          <div class="day-section__tasks">${day.tasks.map(taskPanel)}</div>
+        </section>
+      `;
 
 export default {
   title: 'Examples/Study Companion'
 };
 
 /**
- * User story: _As a student, I want to see all tasks for the week in a clear view,
+ * User story: _As a student, I want to see my upcoming events grouped by day,
  * so I can plan my study time and priorities quickly._
  *
  * Composition:
- * - Tabs — switch the time horizon (Today / This week / Month)
- * - Progress bar — weekly preparation summary
- * - Search field + Select + Date picker + Toggle button group — filter & focus the week
- * - Panel — two roles:
- *     1. one per day, collapsible so the student sees only what matters right now
- *     2. one per task (design decision: no imagery for events → Panel replaces Card),
- *        carrying Avatar + Icon (subject) in the prefix, Badges (subject / priority / status)
- *        in the suffix, a primary Start action, and per-task Progress bar + actions inside
- * - Popover — quick-add popover anchored to the global "New task" button
+ * - Search field + Button — look up events by subject or description
+ * - Select (x4) — filter by subject, event type, status and difficulty
+ * - Date field (x2) — narrow the range with From/To dates
+ * - Day section — a simple header (day label + date) followed by a list of event panels
+ * - Panel — one per event (design decision: no imagery for events → Panel replaces Card),
+ *     with a subject icon prefix, title + event-type subtitle, status badge suffix,
+ *     divider, a body with the subject line + description, and a primary pill Start action
+ * - Popover — quick-add popover anchored to the global "Add something" button
  * - Tooltip — labels for icon-only controls (WCAG 2.2 target-size & non-visual context)
  */
 export const WeeklyView: Story = {
@@ -326,47 +307,41 @@ export const WeeklyView: Story = {
 
     const applyFiltersToRoot = (root: Element) => {
       const toolbar = root.querySelector('.dashboard-toolbar');
-      const subjectFilters = root.querySelector('.subject-filters');
-      if (!toolbar || !subjectFilters) return;
+      if (!toolbar) return;
 
       const searchField = toolbar.querySelector<HTMLInputElement>('sl-search-field');
       const query = (searchField?.value ?? '').toString().trim().toLowerCase();
 
       const selects = toolbar.querySelectorAll<HTMLElement & { value?: string }>('sl-select');
       const subjectValue = selects[0]?.value ?? 'all';
-      const difficultyValue = selects[1]?.value ?? 'all';
-      const topicValue = selects[2]?.value ?? 'all';
-
-      const pressedSubjectKeys = new Set<string>();
-      subjectFilters
-        .querySelectorAll<HTMLElement & { pressed?: boolean }>('sl-toggle-button[data-subject-key]')
-        .forEach(tb => {
-          if (tb.pressed) pressedSubjectKeys.add(tb.dataset.subjectKey ?? '');
-        });
+      const eventTypeValue = selects[1]?.value ?? 'all';
+      const statusValue = selects[2]?.value ?? 'all';
+      const difficultyValue = selects[3]?.value ?? 'all';
 
       const taskMatches = (t: HTMLElement) => {
         const heading = (t.querySelector('[slot="heading"]')?.textContent ?? '').toLowerCase();
         const subjectLabel = (t.dataset.subject ?? '').toLowerCase();
         const subjectKey = t.dataset.subjectKey ?? '';
         const priority = t.dataset.priority ?? '';
-        const topic = t.dataset.topic ?? '';
+        const status = t.dataset.status ?? '';
+        const type = t.dataset.type ?? '';
 
         if (query && !heading.includes(query) && !subjectLabel.includes(query)) return false;
         if (subjectValue !== 'all' && subjectKey !== subjectValue) return false;
+        if (eventTypeValue !== 'all' && type !== eventTypeValue) return false;
+        if (statusValue !== 'all' && status !== statusValue) return false;
         if (difficultyValue !== 'all' && priority !== difficultyToPriority[difficultyValue]) return false;
-        if (topicValue !== 'all' && topic !== topicValue) return false;
-        if (pressedSubjectKeys.size > 0 && !pressedSubjectKeys.has(subjectKey)) return false;
 
         return true;
       };
 
-      const taskPanels = root.querySelectorAll<HTMLElement>('sl-tab-panel sl-panel[data-subject-key]');
+      const taskPanels = root.querySelectorAll<HTMLElement>('.day-section sl-panel[data-subject-key]');
       const dayVisibility = new Map<HTMLElement, boolean>();
 
       taskPanels.forEach(t => {
         const ok = taskMatches(t);
         t.style.display = ok ? '' : 'none';
-        const day = t.parentElement?.closest<HTMLElement>('sl-panel:not([data-subject-key])');
+        const day = t.closest<HTMLElement>('.day-section');
         if (day) dayVisibility.set(day, (dayVisibility.get(day) ?? false) || ok);
       });
 
@@ -425,45 +400,72 @@ export const WeeklyView: Story = {
         }
         .study-dashboard {
           display: grid;
-          gap: 1rem;
-          max-inline-size: 960px;
+          gap: 1.5rem;
+          max-inline-size: 720px;
           margin: 0 auto;
-          padding: 1rem;
+          padding: 2rem 1rem;
           font: var(--sl-text-body-md);
         }
         .dashboard-header {
           display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          flex-wrap: wrap;
+          justify-content: center;
+          margin-block-end: 0.5rem;
         }
         .dashboard-header h1 {
           margin: 0;
-          font: var(--sl-text-heading-lg);
-          flex: 1 1 auto;
+          /* Figma 'Heading/xl' (node 834:31854): 32px / 40px, semiBold. */
+          font: var(--sl-text-new-heading-xl);
+          font-weight: var(--sl-text-new-typeset-fontWeight-semiBold);
+          color: var(--sl-color-foreground-plain);
+          text-align: center;
         }
         .dashboard-toolbar {
           display: grid;
-          grid-template-columns: 1fr auto auto;
-          gap: 0.75rem;
+          gap: 1rem;
+        }
+        .toolbar-search {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 0.5rem;
           align-items: end;
         }
-        .subject-filters {
-          display: flex;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-        }
-        .week-summary {
+        .toolbar-selects {
           display: grid;
-          gap: 0.25rem;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 0.5rem;
         }
-        sl-progress-bar {
-          max-inline-size: 33.3333%;
+        .toolbar-dates {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) 1fr;
+          gap: 0.5rem;
+          align-items: end;
+        }
+        .toolbar-dates > :last-child {
+          /* spacer so the two date fields keep their natural width */
+        }
+        .day-section {
+          display: grid;
+          gap: 0.75rem;
+        }
+        .day-section__header {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          margin: var(--sl-size-250) 0;
+          font-weight: var(--sl-text-new-typeset-fontWeight-semiBold, 600);
+          color: var(--sl-color-foreground-bold);
+        }
+        .day-section__date {
+          color: var(--sl-color-foreground-bold);
+        }
+        .day-section__tasks {
+          display: grid;
+          gap: 1rem;
         }
         /* Kid-friendly: rounder panels, softer shadows, chunkier spacing */
         .study-dashboard sl-panel {
-          --sl-panel-border-radius: 1.25rem;
-          border-radius: 1.25rem;
+          --sl-panel-border-radius: 0.75rem;
+          border-radius: 0.75rem;
           overflow: hidden;
         }
         /* Task panel header layout matches Figma (node 869:10300):
@@ -518,14 +520,12 @@ export const WeeklyView: Story = {
         .task-panel::part(content) {
           padding: 16px 24px 24px 24px;
         }
-        .study-dashboard sl-search-field,
-        .study-dashboard sl-select,
-        .study-dashboard sl-date-field {
-          --sl-input-border-radius: 999px;
-        }
         @media (max-inline-size: 720px) {
-          .dashboard-toolbar {
-            grid-template-columns: 1fr;
+          .toolbar-selects {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          .toolbar-dates {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
       </style>
@@ -553,125 +553,63 @@ export const WeeklyView: Story = {
 
       <main class="study-dashboard">
         <header class="dashboard-header">
-          <sl-avatar display-name="Ada Kowalska" size="md"></sl-avatar>
-          <h1>Hi, Ada — this is your week</h1>
-
-          <sl-tooltip id="tt-add-global" position="bottom">Add something new</sl-tooltip>
-          <sl-button id="btn-new-task" variant="primary" shape="pill" size="lg" aria-describedby="tt-add-global">
-            <sl-icon name="far-plus"></sl-icon>
-            Add something
-          </sl-button>
-          <sl-popover anchor="btn-new-task" position="bottom-end">
-            <div style="display: grid; gap: 0.5rem; max-inline-size: 280px;">
-              <strong>What do you want to add?</strong>
-              <sl-search-field aria-label="Task title" placeholder="e.g. Math test on Friday"></sl-search-field>
-              <sl-select aria-label="Subject" placeholder="Which subject?">
-                ${subjects.map(s => html`<sl-option value=${s.key}>${s.label}</sl-option>`)}
-              </sl-select>
-              <sl-date-field aria-label="Due date"></sl-date-field>
-              <sl-button-bar align="end"
-                ><sl-button variant="primary" shape="pill" size="sm">Add it</sl-button></sl-button-bar
-              >
-            </div>
-          </sl-popover>
+          <h1>Your upcoming events</h1>
         </header>
 
-        <section class="week-summary" aria-label="Your week so far">
-          <sl-progress-bar .value=${42} label="Your week so far">
-            <strong>5 down, 7 to go</strong> · you're doing great 🎯
-          </sl-progress-bar>
-        </section>
-
         <div class="dashboard-toolbar">
-          <sl-search-field
-            aria-label="Search tasks"
-            placeholder="Search tasks, subjects, materials…"
-            @sl-change=${applyFilters}
-            @keydown=${(e: KeyboardEvent) => {
-              if (e.key === 'Enter') applyFilters(e);
-            }}
-          ></sl-search-field>
-          <sl-button aria-label="Search" variant="primary" @click=${applyFilters}>Search</sl-button>
+          <div class="toolbar-search">
+            <sl-search-field
+              label="Search events by subject or description"
+              placeholder="ex. biology"
+              @sl-change=${applyFilters}
+              @keydown=${(e: KeyboardEvent) => {
+                if (e.key === 'Enter') applyFilters(e);
+              }}
+            ></sl-search-field>
+            <sl-button aria-label="Search" variant="primary" fill="outline" @click=${applyFilters}>Search</sl-button>
+          </div>
 
-          <sl-select aria-label="Filter by subject" placeholder="All subjects" @sl-change=${applyFilters}>
-            <sl-option value="all">All subjects</sl-option>
-            ${subjects.map(
-              s => html`
-                <sl-option value=${s.key}>
-                  <sl-icon name=${s.iconName} slot="prefix"></sl-icon>
-                  ${s.label}
-                </sl-option>
-              `
-            )}
-          </sl-select>
+          <div class="toolbar-selects">
+            <sl-select aria-label="Filter by subject" placeholder="Subject" @sl-change=${applyFilters}>
+              <sl-option value="all">All subjects</sl-option>
+              ${subjects.map(
+                s => html`
+                  <sl-option value=${s.key}>
+                    <sl-icon name=${s.iconName} slot="prefix"></sl-icon>
+                    ${s.label}
+                  </sl-option>
+                `
+              )}
+            </sl-select>
 
-          <sl-select aria-label="Filter by difficulty" value="all" @sl-change=${applyFilters}>
-            <sl-option value="all">All</sl-option>
-            <sl-option value="easy">Easy 🌶️</sl-option>
-            <sl-option value="medium">Medium 🌶️🌶️</sl-option>
-            <sl-option value="hard">Hard 🌶️🌶️🌶️</sl-option>
-          </sl-select>
+            <sl-select aria-label="Filter by event type" placeholder="Event type" @sl-change=${applyFilters}>
+              <sl-option value="all">All types</sl-option>
+              ${allEventTypes.map(t => html`<sl-option value=${t.slug}>${t.label}</sl-option>`)}
+            </sl-select>
 
-          <sl-select aria-label="Filter by topic" value="all" @sl-change=${applyFilters}>
-            <sl-option value="all">All topics</sl-option>
-            ${allTopics.map(t => html`<sl-option value=${t.slug}>${t.label}</sl-option>`)}
-          </sl-select>
+            <sl-select aria-label="Filter by status" placeholder="Status" @sl-change=${applyFilters}>
+              <sl-option value="all">All statuses</sl-option>
+              <sl-option value="todo">To do</sl-option>
+              <sl-option value="in-progress">In progress</sl-option>
+              <sl-option value="done">Done</sl-option>
+            </sl-select>
 
-          <sl-date-field aria-label="Jump to date"></sl-date-field>
+            <sl-select aria-label="Filter by difficulty" placeholder="Difficulty" @sl-change=${applyFilters}>
+              <sl-option value="all">All difficulties</sl-option>
+              <sl-option value="easy">Easy 🌶️</sl-option>
+              <sl-option value="medium">Medium 🌶️🌶️</sl-option>
+              <sl-option value="hard">Hard 🌶️🌶️🌶️</sl-option>
+            </sl-select>
+          </div>
+
+          <div class="toolbar-dates">
+            <sl-date-field label="From date"></sl-date-field>
+            <sl-date-field label="To date"></sl-date-field>
+            <span aria-hidden="true"></span>
+          </div>
         </div>
 
-        <div class="subject-filters" role="group" aria-label="Quick subject filters">
-          ${subjects.map(
-            s => html`
-              <sl-tooltip id=${`tt-${s.key}`} position="top">Show only ${s.label}</sl-tooltip>
-              <sl-toggle-button
-                fill="outline"
-                shape="pill"
-                data-subject-key=${s.key}
-                aria-label=${s.label}
-                aria-describedby=${`tt-${s.key}`}
-                @sl-toggle=${applyFilters}
-              >
-                <sl-icon name=${s.iconName} slot="default"></sl-icon>
-                <sl-icon name=${s.iconNamePressed} slot="pressed"></sl-icon>
-              </sl-toggle-button>
-            `
-          )}
-          <sl-tooltip id="tt-more-filters" position="top">More filters (status, priority, duration)</sl-tooltip>
-          <sl-toggle-button fill="outline" shape="pill" aria-label="More filters" aria-describedby="tt-more-filters">
-            <sl-icon name="far-filter" slot="default"></sl-icon>
-            <sl-icon name="far-check" slot="pressed"></sl-icon>
-          </sl-toggle-button>
-        </div>
-
-        <sl-tab-group>
-          <sl-tab>
-            Today
-            <sl-badge color="orange" size="sm" style="margin-inline-start: 0.25rem;">2</sl-badge>
-          </sl-tab>
-          <sl-tab selected>
-            This week
-            <sl-badge color="blue" size="sm" style="margin-inline-start: 0.25rem;">6</sl-badge>
-          </sl-tab>
-          <sl-tab>
-            Later
-            <sl-badge color="neutral" size="sm" style="margin-inline-start: 0.25rem;">14</sl-badge>
-          </sl-tab>
-
-          <sl-tab-panel>
-            <div style="display: grid; gap: 1.5rem;">${week[0].tasks.map(taskPanel)}</div>
-          </sl-tab-panel>
-
-          <sl-tab-panel>
-            <div style="display: grid; gap: 1.5rem;">${week.map(dayPanel)}</div>
-          </sl-tab-panel>
-
-          <sl-tab-panel>
-            <p style="color: var(--sl-color-foreground-muted);">
-              The "Later" view isn't built yet — check "Today" or "This week" for what's coming up.
-            </p>
-          </sl-tab-panel>
-        </sl-tab-group>
+        <div class="week-days">${week.map(daySection)}</div>
       </main>
     `;
   }
