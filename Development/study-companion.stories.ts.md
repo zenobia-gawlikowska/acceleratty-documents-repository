@@ -189,7 +189,7 @@ const statusBadge = (status: Task['status']) => {
     return html`<sl-badge color="green" emphasis="subtle" size="lg">Done</sl-badge>`;
   }
   if (status === 'in-progress') {
-    return html`<sl-badge color="purple" emphasis="subtle" size="lg">Working on it</sl-badge>`;
+    return html`<sl-badge color="blue" emphasis="subtle" size="lg">In progress</sl-badge>`;
   }
   return html`<sl-badge color="orange" emphasis="subtle" size="lg">To do</sl-badge>`;
 };
@@ -210,6 +210,14 @@ const spice = (priority: Task['priority']) => {
 // A task's "topic" is the part of the title before " — " (e.g. "Quadratic equations"
 // from "Quadratic equations — test"). Used to populate the topic filter select.
 const topicOf = (task: Task) => task.title.split(' — ')[0].trim();
+// A task's "type" is the part after " — " (e.g. "test", "essay outline"). Shown
+// as a subtitle line in the panel header, alongside the difficulty peppers.
+const typeOf = (task: Task) => {
+  const parts = task.title.split(' — ');
+  if (parts.length < 2) return '';
+  const type = parts.slice(1).join(' — ').trim();
+  return type.charAt(0).toUpperCase() + type.slice(1);
+};
 const topicSlug = (topic: string) =>
   topic
     .toLowerCase()
@@ -222,9 +230,23 @@ const allTopics: Array<{ slug: string; label: string }> = Array.from(
   .map(([slug, label]) => ({ slug, label }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
+const taskAction = (task: Task) => {
+  if (task.status === 'done') return null;
+  if (task.status === 'in-progress') {
+    return html`
+      <sl-tooltip id=${`tt-continue-${task.id}`} position="top">Pick up where you left off</sl-tooltip>
+      <sl-button fill="link" aria-describedby=${`tt-continue-${task.id}`}>Continue</sl-button>
+    `;
+  }
+  return html`
+    <sl-tooltip id=${`tt-start-${task.id}`} position="top">Jump in and start this one</sl-tooltip>
+    <sl-button variant="primary" shape="pill" aria-describedby=${`tt-start-${task.id}`}>Start</sl-button>
+  `;
+};
+
 const taskPanel = (task: Task) => html`
   <sl-panel
-    heading=${`${task.title}${spice(task.priority)}`}
+    class="task-panel"
     data-subject=${task.subject.label}
     data-subject-key=${task.subject.key}
     data-priority=${task.priority}
@@ -232,7 +254,11 @@ const taskPanel = (task: Task) => html`
     divider
   >
     <sl-icon slot="prefix" name=${task.subject.iconName}></sl-icon>
-    <span slot="aside" style="display: flex; justify-content: flex-end;">${statusBadge(task.status)}</span>
+    <div slot="heading" class="task-heading">
+      <span class="task-heading__title">${topicOf(task)}</span>
+      <span class="task-heading__subtitle">${typeOf(task)}${spice(task.priority)}</span>
+    </div>
+    <span slot="aside" class="task-aside">${statusBadge(task.status)}</span>
 
     <div style="display: grid; gap: 1rem;">
       <div style="display: grid; gap: 0.5rem;">
@@ -243,10 +269,7 @@ const taskPanel = (task: Task) => html`
         ${task.note ? html`<p style="margin: 0;">${task.note}</p>` : null}
       </div>
 
-      <sl-button-bar align="end">
-        <sl-tooltip id=${`tt-start-${task.id}`} position="top">Jump in and start this one</sl-tooltip>
-        <sl-button variant="primary" shape="pill" aria-describedby=${`tt-start-${task.id}`}>Start</sl-button>
-      </sl-button-bar>
+      <sl-button-bar align="end"> ${taskAction(task)} </sl-button-bar>
     </div>
   </sl-panel>
 `;
@@ -269,7 +292,7 @@ const dayPanel = (day: (typeof week)[number]) => html`
 
     ${day.tasks.length === 0
       ? html`<p style="margin: 0; color: var(--sl-color-foreground-muted);">No tasks planned.</p>`
-      : html`<div style="display: grid; gap: 0.75rem;">${day.tasks.map(taskPanel)}</div>`}
+      : html`<div style="display: grid; gap: 1.5rem;">${day.tasks.map(taskPanel)}</div>`}
   </sl-panel>
 `;
 
@@ -322,7 +345,7 @@ export const WeeklyView: Story = {
         });
 
       const taskMatches = (t: HTMLElement) => {
-        const heading = (t.getAttribute('heading') ?? '').toLowerCase();
+        const heading = (t.querySelector('[slot="heading"]')?.textContent ?? '').toLowerCase();
         const subjectLabel = (t.dataset.subject ?? '').toLowerCase();
         const subjectKey = t.dataset.subjectKey ?? '';
         const priority = t.dataset.priority ?? '';
@@ -442,6 +465,58 @@ export const WeeklyView: Story = {
           --sl-panel-border-radius: 1.25rem;
           border-radius: 1.25rem;
           overflow: hidden;
+        }
+        /* Task panel header layout matches Figma (node 869:10300):
+           padding 14px 16px 14px 24px, 6px gap between prefix/title,
+           icon aligned with the title's first line. */
+        .task-panel::part(header) {
+          padding: 14px 16px 14px 24px;
+          min-block-size: 0;
+          gap: 6px;
+        }
+        .task-panel::part(wrapper) {
+          align-items: start;
+          gap: 6px;
+        }
+        .task-panel > sl-icon[slot='prefix'] {
+          /* Visually center the 16px icon on the title glyph (not just the line box). */
+          block-size: 20px;
+          display: inline-flex;
+          align-items: center;
+          padding-block-start: 6px;
+        }
+        /* Stacked title + event-type subtitle in the task panel header
+           (Figma: Multitenant materials, node 869:10300). */
+        .task-heading {
+          display: grid;
+          gap: 4px;
+          /* Override the panel's default heading padding so the title aligns
+             with the prefix icon at the top of the header. */
+          padding-block: 0 !important;
+        }
+        .task-heading__title {
+          font-size: 16px;
+          font-weight: var(--sl-text-new-typeset-fontWeight-semiBold, 500);
+          line-height: 20px;
+          color: var(--sl-color-foreground-bold);
+        }
+        .task-heading__subtitle {
+          font-size: 14px;
+          font-weight: var(--sl-text-new-typeset-fontWeight-regular, 400);
+          line-height: 20px;
+          color: var(--sl-color-foreground-plain);
+        }
+        /* Top-align the status badge with the title (not centered on the stacked heading). */
+        .task-aside {
+          display: flex;
+          justify-content: flex-end;
+          align-self: start;
+          padding-block-start: 14px;
+          padding-inline-end: 16px;
+        }
+        /* Figma body padding: 16px 24px 24px 24px (spacing below the divider). */
+        .task-panel::part(content) {
+          padding: 16px 24px 24px 24px;
         }
         .study-dashboard sl-search-field,
         .study-dashboard sl-select,
@@ -577,11 +652,11 @@ export const WeeklyView: Story = {
           </sl-tab>
 
           <sl-tab-panel>
-            <div style="display: grid; gap: 0.75rem;">${week[0].tasks.map(taskPanel)}</div>
+            <div style="display: grid; gap: 1.5rem;">${week[0].tasks.map(taskPanel)}</div>
           </sl-tab-panel>
 
           <sl-tab-panel>
-            <div style="display: grid; gap: 0.75rem;">${week.map(dayPanel)}</div>
+            <div style="display: grid; gap: 1.5rem;">${week.map(dayPanel)}</div>
           </sl-tab-panel>
 
           <sl-tab-panel>
