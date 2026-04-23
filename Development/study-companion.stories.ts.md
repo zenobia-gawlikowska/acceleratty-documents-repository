@@ -195,7 +195,7 @@ const spice = (priority: Task['priority']) => {
 // icon prefix, title heading, subtle status badge suffix, divider, body with
 // subject line + description, and a primary pill `Start` action in a button-bar.
 const taskPanel = (task: Task) => html`
-  <sl-panel heading=${`${task.title}${spice(task.priority)}`} divider>
+  <sl-panel heading=${`${task.title}${spice(task.priority)}`} data-subject=${task.subject.label} divider>
     <sl-icon slot="prefix" name=${task.subject.iconName}></sl-icon>
     <span slot="aside" style="display: flex; justify-content: flex-end;">${statusBadge(task.status)}</span>
 
@@ -259,157 +259,197 @@ export default {
  * - Tooltip — labels for icon-only controls (WCAG 2.2 target-size & non-visual context)
  */
 export const WeeklyView: Story = {
-  render: () => html`
-    <style>
-      .study-dashboard {
-        display: grid;
-        gap: 1rem;
-        max-inline-size: 960px;
-        margin: 0 auto;
-        padding: 1rem;
-        font: var(--sl-text-body-md);
-      }
-      .dashboard-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-      }
-      .dashboard-header h1 {
-        margin: 0;
-        font: var(--sl-text-heading-lg);
-        flex: 1 1 auto;
-      }
-      .dashboard-toolbar {
-        display: grid;
-        grid-template-columns: 1fr auto auto;
-        gap: 0.75rem;
-        align-items: end;
-      }
-      .subject-filters {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-      .week-summary {
-        display: grid;
-        gap: 0.25rem;
-      }
-      sl-progress-bar {
-        max-inline-size: 33.3333%;
-      }
-      /* Kid-friendly: rounder panels, softer shadows, chunkier spacing */
-      .study-dashboard sl-panel {
-        --sl-panel-border-radius: 1.25rem;
-        border-radius: 1.25rem;
-        overflow: hidden;
-      }
-      .study-dashboard sl-search-field,
-      .study-dashboard sl-select,
-      .study-dashboard sl-date-field {
-        --sl-input-border-radius: 999px;
-      }
-      @media (max-inline-size: 720px) {
-        .dashboard-toolbar {
-          grid-template-columns: 1fr;
+  render: () => {
+    const runSearch = (event: Event) => {
+      const root = (event.target as HTMLElement).closest('.study-dashboard');
+      if (!root) return;
+
+      const searchField = root.querySelector<HTMLInputElement>('.dashboard-toolbar sl-search-field');
+      const query = (searchField?.value ?? '').toString().trim().toLowerCase();
+      const weekTabPanel = root.querySelectorAll('sl-tab-panel')[1];
+      if (!weekTabPanel) return;
+
+      const dayPanels = weekTabPanel.querySelectorAll<HTMLElement>(':scope > div > sl-panel');
+      dayPanels.forEach(day => {
+        const taskPanels = day.querySelectorAll<HTMLElement>('sl-panel');
+
+        if (!query) {
+          day.style.display = '';
+          taskPanels.forEach(t => (t.style.display = ''));
+          return;
         }
-      }
-    </style>
 
-    <div class="study-dashboard">
-      <header class="dashboard-header">
-        <sl-avatar display-name="Ada Kowalska" size="md"></sl-avatar>
-        <h1>Hi, Ada — this is your week</h1>
+        let anyVisible = false;
+        taskPanels.forEach(t => {
+          const heading = (t.getAttribute('heading') ?? '').toLowerCase();
+          const subject = (t.getAttribute('data-subject') ?? '').toLowerCase();
+          const match = heading.includes(query) || subject.includes(query);
+          t.style.display = match ? '' : 'none';
+          if (match) anyVisible = true;
+        });
+        day.style.display = anyVisible ? '' : 'none';
+      });
+    };
 
-        <sl-tooltip id="tt-add-global" position="bottom">Add something new</sl-tooltip>
-        <sl-button id="btn-new-task" variant="primary" shape="pill" size="lg" aria-describedby="tt-add-global">
-          <sl-icon name="far-plus"></sl-icon>
-          Add something
-        </sl-button>
-        <sl-popover anchor="btn-new-task" position="bottom-end">
-          <div style="display: grid; gap: 0.5rem; max-inline-size: 280px;">
-            <strong>What do you want to add?</strong>
-            <sl-search-field aria-label="Task title" placeholder="e.g. Math test on Friday"></sl-search-field>
-            <sl-select aria-label="Subject" placeholder="Which subject?">
-              ${subjects.map(s => html`<sl-option value=${s.key}>${s.label}</sl-option>`)}
-            </sl-select>
-            <sl-date-field aria-label="Due date"></sl-date-field>
-            <sl-button-bar align="end"
-              ><sl-button variant="primary" shape="pill" size="sm">Add it</sl-button></sl-button-bar
-            >
-          </div>
-        </sl-popover>
-      </header>
+    return html`
+      <style>
+        .study-dashboard {
+          display: grid;
+          gap: 1rem;
+          max-inline-size: 960px;
+          margin: 0 auto;
+          padding: 1rem;
+          font: var(--sl-text-body-md);
+        }
+        .dashboard-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+        }
+        .dashboard-header h1 {
+          margin: 0;
+          font: var(--sl-text-heading-lg);
+          flex: 1 1 auto;
+        }
+        .dashboard-toolbar {
+          display: grid;
+          grid-template-columns: 1fr auto auto;
+          gap: 0.75rem;
+          align-items: end;
+        }
+        .subject-filters {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+        .week-summary {
+          display: grid;
+          gap: 0.25rem;
+        }
+        sl-progress-bar {
+          max-inline-size: 33.3333%;
+        }
+        /* Kid-friendly: rounder panels, softer shadows, chunkier spacing */
+        .study-dashboard sl-panel {
+          --sl-panel-border-radius: 1.25rem;
+          border-radius: 1.25rem;
+          overflow: hidden;
+        }
+        .study-dashboard sl-search-field,
+        .study-dashboard sl-select,
+        .study-dashboard sl-date-field {
+          --sl-input-border-radius: 999px;
+        }
+        @media (max-inline-size: 720px) {
+          .dashboard-toolbar {
+            grid-template-columns: 1fr;
+          }
+        }
+      </style>
 
-      <section class="week-summary" aria-label="Your week so far">
-        <sl-progress-bar .value=${42} label="Your week so far">
-          <strong>5 down, 7 to go</strong> · you're doing great 🎯
-        </sl-progress-bar>
-      </section>
+      <div class="study-dashboard">
+        <header class="dashboard-header">
+          <sl-avatar display-name="Ada Kowalska" size="md"></sl-avatar>
+          <h1>Hi, Ada — this is your week</h1>
 
-      <div class="dashboard-toolbar">
-        <sl-search-field aria-label="Search tasks" placeholder="Search tasks, subjects, materials…"></sl-search-field>
+          <sl-tooltip id="tt-add-global" position="bottom">Add something new</sl-tooltip>
+          <sl-button id="btn-new-task" variant="primary" shape="pill" size="lg" aria-describedby="tt-add-global">
+            <sl-icon name="far-plus"></sl-icon>
+            Add something
+          </sl-button>
+          <sl-popover anchor="btn-new-task" position="bottom-end">
+            <div style="display: grid; gap: 0.5rem; max-inline-size: 280px;">
+              <strong>What do you want to add?</strong>
+              <sl-search-field aria-label="Task title" placeholder="e.g. Math test on Friday"></sl-search-field>
+              <sl-select aria-label="Subject" placeholder="Which subject?">
+                ${subjects.map(s => html`<sl-option value=${s.key}>${s.label}</sl-option>`)}
+              </sl-select>
+              <sl-date-field aria-label="Due date"></sl-date-field>
+              <sl-button-bar align="end"
+                ><sl-button variant="primary" shape="pill" size="sm">Add it</sl-button></sl-button-bar
+              >
+            </div>
+          </sl-popover>
+        </header>
 
-        <sl-select aria-label="Filter by subject" placeholder="All subjects">
-          <sl-option value="all">All subjects</sl-option>
+        <section class="week-summary" aria-label="Your week so far">
+          <sl-progress-bar .value=${42} label="Your week so far">
+            <strong>5 down, 7 to go</strong> · you're doing great 🎯
+          </sl-progress-bar>
+        </section>
+
+        <div class="dashboard-toolbar">
+          <sl-search-field
+            aria-label="Search tasks"
+            placeholder="Search tasks, subjects, materials…"
+            @keydown=${(e: KeyboardEvent) => {
+              if (e.key === 'Enter') runSearch(e);
+            }}
+          ></sl-search-field>
+          <sl-button aria-label="Search" variant="primary" @click=${runSearch}>Search</sl-button>
+
+          <sl-select aria-label="Filter by subject" placeholder="All subjects">
+            <sl-option value="all">All subjects</sl-option>
+            ${subjects.map(
+              s => html`
+                <sl-option value=${s.key}>
+                  <sl-icon name=${s.iconName} slot="prefix"></sl-icon>
+                  ${s.label}
+                </sl-option>
+              `
+            )}
+          </sl-select>
+
+          <sl-date-field aria-label="Jump to date"></sl-date-field>
+        </div>
+
+        <div class="subject-filters" role="group" aria-label="Quick subject filters">
           ${subjects.map(
             s => html`
-              <sl-option value=${s.key}>
-                <sl-icon name=${s.iconName} slot="prefix"></sl-icon>
-                ${s.label}
-              </sl-option>
+              <sl-tooltip id=${`tt-${s.key}`} position="top">Show only ${s.label}</sl-tooltip>
+              <sl-toggle-button fill="outline" shape="pill" aria-label=${s.label} aria-describedby=${`tt-${s.key}`}>
+                <sl-icon name=${s.iconName} slot="default"></sl-icon>
+                <sl-icon name="far-check" slot="pressed"></sl-icon>
+              </sl-toggle-button>
             `
           )}
-        </sl-select>
+          <sl-tooltip id="tt-more-filters" position="top">More filters (status, priority, duration)</sl-tooltip>
+          <sl-toggle-button fill="outline" shape="pill" aria-label="More filters" aria-describedby="tt-more-filters">
+            <sl-icon name="far-filter" slot="default"></sl-icon>
+            <sl-icon name="far-check" slot="pressed"></sl-icon>
+          </sl-toggle-button>
+        </div>
 
-        <sl-date-field aria-label="Jump to date"></sl-date-field>
+        <sl-tab-group>
+          <sl-tab>
+            Today
+            <sl-badge color="orange" size="sm" style="margin-inline-start: 0.25rem;">2</sl-badge>
+          </sl-tab>
+          <sl-tab selected>
+            This week
+            <sl-badge color="blue" size="sm" style="margin-inline-start: 0.25rem;">6</sl-badge>
+          </sl-tab>
+          <sl-tab>
+            Later
+            <sl-badge color="neutral" size="sm" style="margin-inline-start: 0.25rem;">14</sl-badge>
+          </sl-tab>
+
+          <sl-tab-panel>
+            <div style="display: grid; gap: 0.75rem;">${week[0].tasks.map(taskPanel)}</div>
+          </sl-tab-panel>
+
+          <sl-tab-panel>
+            <div style="display: grid; gap: 0.75rem;">${week.map(dayPanel)}</div>
+          </sl-tab-panel>
+
+          <sl-tab-panel>
+            <p style="color: var(--sl-color-foreground-muted);">
+              The "Later" view isn't built yet — check "Today" or "This week" for what's coming up.
+            </p>
+          </sl-tab-panel>
+        </sl-tab-group>
       </div>
-
-      <div class="subject-filters" role="group" aria-label="Quick subject filters">
-        ${subjects.map(
-          s => html`
-            <sl-tooltip id=${`tt-${s.key}`} position="top">Show only ${s.label}</sl-tooltip>
-            <sl-toggle-button fill="outline" shape="pill" aria-label=${s.label} aria-describedby=${`tt-${s.key}`}>
-              <sl-icon name=${s.iconName} slot="default"></sl-icon>
-              <sl-icon name="far-check" slot="pressed"></sl-icon>
-            </sl-toggle-button>
-          `
-        )}
-        <sl-tooltip id="tt-more-filters" position="top">More filters (status, priority, duration)</sl-tooltip>
-        <sl-toggle-button fill="outline" shape="pill" aria-label="More filters" aria-describedby="tt-more-filters">
-          <sl-icon name="far-filter" slot="default"></sl-icon>
-          <sl-icon name="far-check" slot="pressed"></sl-icon>
-        </sl-toggle-button>
-      </div>
-
-      <sl-tab-group>
-        <sl-tab>
-          Today
-          <sl-badge color="orange" size="sm" style="margin-inline-start: 0.25rem;">2</sl-badge>
-        </sl-tab>
-        <sl-tab selected>
-          This week
-          <sl-badge color="blue" size="sm" style="margin-inline-start: 0.25rem;">6</sl-badge>
-        </sl-tab>
-        <sl-tab>
-          Later
-          <sl-badge color="neutral" size="sm" style="margin-inline-start: 0.25rem;">14</sl-badge>
-        </sl-tab>
-
-        <sl-tab-panel>
-          <div style="display: grid; gap: 0.75rem;">${week[0].tasks.map(taskPanel)}</div>
-        </sl-tab-panel>
-
-        <sl-tab-panel>
-          <div style="display: grid; gap: 0.75rem;">${week.map(dayPanel)}</div>
-        </sl-tab-panel>
-
-        <sl-tab-panel>
-          <p style="color: var(--sl-color-foreground-muted);">
-            The "Later" view isn't built yet — check "Today" or "This week" for what's coming up.
-          </p>
-        </sl-tab-panel>
-      </sl-tab-group>
-    </div>
-  `
+    `;
+  }
 };
