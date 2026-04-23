@@ -35,13 +35,12 @@ test.describe('Study Companion Weekly View', () => {
     await preview.locator('sl-select-button[label=Status]').waitFor({ state: 'visible', timeout: 5000 });
     // Type a search query
     await preview.locator('sl-select-button[label=Status]').click();
-    await page.locator('sl-option[value=english]').click();
+    await page.locator('sl-option[value=todo]').click();
     await preview.getByRole('button', { name: /Search/i }).press('Enter');
     // Verify search results are visible
-    await expect(preview.getByText(/🏴󠁧󠁢󠁥󠁮󠁧󠁿 English\s*Description for the student, what they need to do/i)).toBeVisible();
-    await expect(
-      preview.getByText(/🌍 Geography\s*Description for the student, what they need to do/i)
-    ).not.toBeVisible();
+    await expect(preview.getByText(/To Do/)).toBeVisible();
+    await expect(preview.getByText(/In Progress/)).not.toBeVisible();
+    await expect(preview.getByText(/Done/)).not.toBeVisible();
   });
 
   test('can use filter by Difficulty', async ({ page }) => {
@@ -54,13 +53,9 @@ test.describe('Study Companion Weekly View', () => {
     await page.locator('sl-option[value=easy]').click();
     await preview.getByRole('button', { name: /Search/i }).press('Enter');
     // Verify search results are visible
-    await expect(
-      preview.getByText(/🏴󠁧󠁢󠁥󠁮󠁧󠁿 English\s*Description for the student, what they need to do/i)
-    ).not.toBeVisible();
-    await expect(
-      preview.getByText(/🌍 Geography\s*Description for the student, what they need to do/i)
-    ).not.toBeVisible();
-    await expect(preview.getByText(/🧬 Biology\s*Description for the student, what they need to do/i)).toBeVisible();
+    await expect(preview.getByText('🌶️')).toBeVisible();
+    await expect(preview.getByText('🌶️🌶️')).not.toBeVisible();
+    await expect(preview.getByText('🌶️🌶️🌶️')).not.toBeVisible();
   });
 
   test('can use filter by Subject', async ({ page }) => {
@@ -73,13 +68,9 @@ test.describe('Study Companion Weekly View', () => {
     await page.locator('sl-option[value=biology]').click();
     await preview.getByRole('button', { name: /Search/i }).press('Enter');
     // Verify search results are visible
-    await expect(
-      preview.getByText(/🏴󠁧󠁢󠁥󠁮󠁧󠁿 English\s*Description for the student, what they need to do/i)
-    ).not.toBeVisible();
-    await expect(
-      preview.getByText(/🌍 Geography\s*Description for the student, what they need to do/i)
-    ).not.toBeVisible();
-    await expect(preview.getByText(/🧬 Biology\s*Description for the student, what they need to do/i)).toBeVisible();
+    await expect(preview.getByText('🏴󠁧󠁢󠁥󠁮󠁧󠁿 English')).not.toBeVisible();
+    await expect(preview.getByText('🌍 Geography')).not.toBeVisible();
+    await expect(preview.getByText('🧬 Biology')).toBeVisible();
   });
 
   test('can use filter by Event type', async ({ page }) => {
@@ -92,12 +83,9 @@ test.describe('Study Companion Weekly View', () => {
     await page.locator('sl-option[value=exam]').click();
     await preview.getByRole('button', { name: /Search/i }).press('Enter');
     // Verify search results are visible
-    await expect(preview.getByText(/🏴󠁧󠁢󠁥󠁮󠁧󠁿 English\s*Description for the student, what they need to do/i)).toBeVisible();
-    await expect(
-      preview.getByText(/🌍 Geography\s*Description for the student, what they need to do/i)
-    ).not.toBeVisible();
-    await expect(
-      preview.getByText(/🧬 Biology\s*Description for the student, what they need to do/i)
-    ).not.toBeVisible();
+    await expect(preview.getByText(/Exam 🌶️️️🌶️️️🌶️/)).toBeVisible();
+    await expect(preview.getByText(/Test 🌶️️️🌶️/)).not.toBeVisible();
+    await expect(preview.getByText(/Test 🌶️/)).not.toBeVisible();
+    await expect(preview.getByText(/Oral exam/)).not.toBeVisible();
   });
 });
