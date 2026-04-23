@@ -293,6 +293,47 @@ export const WeeklyView: Story = {
 
     return html`
       <style>
+        .top-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 64px;
+          background: #fff;
+          box-shadow:
+            0 1px 1px rgba(0, 0, 0, 0.09),
+            0 3px 2px rgba(0, 0, 0, 0.05);
+        }
+        .top-bar__logo {
+          display: flex;
+          align-items: center;
+          gap: 1.6px;
+          height: 30px;
+        }
+        .top-bar__logomark {
+          width: 22.849px;
+          height: 25.044px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .top-bar__logomark img {
+          width: 21.104px;
+          height: 16px;
+          transform: rotate(-75deg);
+          display: block;
+        }
+        .top-bar__wordmark {
+          width: 201.356px;
+          height: 22px;
+          display: block;
+        }
+        .top-bar__profile {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #222;
+          font: var(--sl-text-body-md);
+        }
         .study-dashboard {
           display: grid;
           gap: 1rem;
@@ -347,6 +388,20 @@ export const WeeklyView: Story = {
           }
         }
       </style>
+
+      <header class="top-bar" role="banner">
+        <div class="top-bar__logo" aria-label="Study Companion">
+          <span class="top-bar__logomark" aria-hidden="true">
+            <img src="/images/study-companion/logomark.svg" alt="" />
+          </span>
+          <img class="top-bar__wordmark" src="/images/study-companion/wordmark.svg" alt="Study Companion" />
+        </div>
+        <div class="top-bar__profile">
+          <sl-avatar display-name="Ada Kowalska" size="md" picture-url="/images/avatar-3.jpg">
+            <sl-badge slot="badge" color="red" emphasis="bold" size="sm" aria-label="3 unread notifications"></sl-badge>
+          </sl-avatar>
+        </div>
+      </header>
 
       <div class="study-dashboard">
         <header class="dashboard-header">
