@@ -95,7 +95,7 @@ Next screen of the flow is ready
 https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=869-3334&t=7OADhkyGImCYrP3w-11
 
 
-##Important!!!
+## Important change 🔥
 Change of buttons in subject panels. "Continue" button
 
 ![screenshot-20260423134854753](/api/file/raw?path=Decyzje%2Fscreenshot-20260423134854753.png)
