@@ -5,18 +5,13 @@
 **Date:** 4/22/2026
 
 
-![screenshot-20260423083537050](/api/file/raw?path=Development%2Fscreenshot-20260423083537050.png)
-
+![screenshot-20260423093804778](/api/file/raw?path=Development%2Fscreenshot-20260423093804778.png)
 
 
 What the page implements
 User story chosen: *"As a student, I want to see all tasks for the week in a clear view, so I can plan my study time and priorities quickly."*
 
 ## Composition of approved components:
-
-
-![screenshot-20260423093804778](/api/file/raw?path=Development%2Fscreenshot-20260423093804778.png)
-
 
 ## WCAG 2.2 AA touchpoints covered
 
