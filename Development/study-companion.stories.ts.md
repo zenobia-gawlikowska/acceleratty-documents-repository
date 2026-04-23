@@ -427,7 +427,7 @@ export const WeeklyView: Story = {
           justify-content: space-between;
           gap: 1rem;
           padding: 8px clamp(1rem, 4vw, 64px);
-          background: #fff;
+          background: var(--sl-color-background-plain);
           box-shadow:
             0 1px 1px rgba(0, 0, 0, 0.09),
             0 3px 2px rgba(0, 0, 0, 0.05);
@@ -463,7 +463,7 @@ export const WeeklyView: Story = {
           display: flex;
           align-items: center;
           gap: 8px;
-          color: #222;
+          color: var(--sl-color-foreground-plain);
           font: var(--sl-text-body-md);
         }
         .study-dashboard {
@@ -562,10 +562,10 @@ export const WeeklyView: Story = {
           gap: 20px;
           padding-block: 20px;
           padding-inline: 20px;
-          background: #fff;
-          border: 1px solid #d0d9e0;
+          background: var(--sl-color-background-plain);
+          border: 1px solid var(--sl-color-border-plain);
           border-radius: 4px;
-          color: #000;
+          color: var(--sl-color-foreground-plain);
           text-align: center;
           font: var(--sl-text-body-md);
           line-height: 20px;
@@ -578,6 +578,14 @@ export const WeeklyView: Story = {
           block-size: 80px;
           object-fit: contain;
           flex: 0 0 auto;
+        }
+        @media (prefers-color-scheme: dark) {
+          .empty-state__image {
+            filter: invert(1) hue-rotate(180deg);
+          }
+        }
+        :root[style*='color-scheme: dark'] .empty-state__image {
+          filter: invert(1) hue-rotate(180deg);
         }
         /* Kid-friendly: rounder panels, softer shadows, chunkier spacing */
         .study-dashboard sl-panel {
