@@ -43,4 +43,23 @@ test.describe('Study Companion Weekly View', () => {
       preview.getByText(/🌍 Geography\s*Description for the student, what they need to do/i)
     ).not.toBeVisible();
   });
+
+  test('can use filter by Difficulty', async ({ page }) => {
+    const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
+
+    // Wait for the search input to render
+    await preview.locator('sl-select-button[label=Difficulty]').waitFor({ state: 'visible', timeout: 5000 });
+    // Type a search query
+    await preview.locator('sl-select-button[label=Difficulty]').click();
+    await page.locator('sl-option[value=easy]').click();
+    await preview.getByRole('button', { name: /Search/i }).press('Enter');
+    // Verify search results are visible
+    await expect(
+      preview.getByText(/🏴󠁧󠁢󠁥󠁮󠁧󠁿 English\s*Description for the student, what they need to do/i)
+    ).not.toBeVisible();
+    await expect(
+      preview.getByText(/🌍 Geography\s*Description for the student, what they need to do/i)
+    ).not.toBeVisible();
+    await expect(preview.getByText(/🧬 Biology\s*Description for the student, what they need to do/i)).toBeVisible();
+  });
 });
