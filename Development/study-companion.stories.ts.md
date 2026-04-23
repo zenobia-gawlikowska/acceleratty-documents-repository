@@ -1027,7 +1027,7 @@ export const TaskDetail: StoryObj<TaskDetailArgs> = {
           min-block-size: 0;
         }
         .scope-panel::part(content) {
-          padding: 0 24px 20px 24px;
+          padding: 12px 16px 16px;
         }
         .scope-panel__heading {
           font-size: 16px;
@@ -1035,17 +1035,17 @@ export const TaskDetail: StoryObj<TaskDetailArgs> = {
           color: var(--sl-color-foreground-bold);
         }
         .scope-panel__intro {
-          margin: 0 0 0.5rem 0;
+          margin: 0 0 0.25rem 0;
           color: var(--sl-color-foreground-plain);
         }
         .scope-panel__list {
           margin: 0;
           padding-inline-start: 1.5rem;
           color: var(--sl-color-foreground-plain);
-          line-height: 1.6;
+          line-height: 1.4;
         }
         .scope-panel__list li + li {
-          margin-block-start: 0.25rem;
+          margin-block-start: 0.125rem;
         }
         /* Resource cards grid. Figma shows 3 side-by-side; wrap to 1 col on narrow. */
         .task-detail__resources {
