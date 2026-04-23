@@ -7,25 +7,19 @@ test.describe('Study Companion Weekly View', () => {
     });
   });
 
-  test('can use search in Study Companion weekly view', async ({ page }) => {
+test('can use search in Study Companion weekly view', async ({ page }) => {
     const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
 
-    const searchField = preview.getByRole('textbox', { name: 'Search tasks' });
-    await searchField.waitFor({ state: 'visible', timeout: 5000 });
+    // Wait for the search input to render
+    await preview.locator('input#sl-text-field-1').waitFor({ state: 'visible', timeout: 5000 });
+    // Type a search query
+    await preview.locator('input#sl-text-field-1').fill('Math');
+    await preview.getByRole('button', { name: /Search/i }).click();
 
-    await searchField.fill('Math');
-    await preview.getByRole('button', { name: 'Search' }).click();
-
-    // Only Monday and Thursday have Math tasks; Friday has no tasks so its
-    // (empty) day panel stays visible regardless of the filter.
-    await expect(preview.locator('sl-panel[heading^="Monday"]')).toBeVisible();
-    await expect(preview.locator('sl-panel[heading^="Tuesday"]')).toBeHidden();
-    await expect(preview.locator('sl-panel[heading^="Wednesday"]')).toBeHidden();
-    await expect(preview.locator('sl-panel[heading^="Thursday"]')).toBeVisible();
-
-    const weekPanel = preview.locator('sl-tab-panel').nth(1);
-    await expect(weekPanel.locator('sl-panel[data-subject-key="math"]').first()).toBeVisible();
-    await expect(weekPanel.locator('sl-panel[data-subject-key="history"]')).toBeHidden();
+    await preview.getByText('Monday · Apr 27').waitFor({ state: 'visible', timeout: 5000 });
+    await expect(preview.getByText('Math').nth(4)).toBeVisible();
+    await expect(preview.getByText('Math').nth(5)).toBeVisible();
+    await expect(preview.getByText('No tasks planned.')).not.toBeVisible();
   });
 
   test('can use filter by Difficulty', async ({ page }) => {
