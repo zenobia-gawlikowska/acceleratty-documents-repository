@@ -1134,6 +1134,7 @@ export const TaskDetail: StoryObj<TaskDetailArgs> = {
       <main class="task-detail">
         <sl-breadcrumbs aria-label="Breadcrumb">
           <a
+            slot="home"
             href="javascript:void(0)"
             @click=${(event: Event) => {
               event.preventDefault();
@@ -1141,6 +1142,15 @@ export const TaskDetail: StoryObj<TaskDetailArgs> = {
             }}
             >Home</a
           >
+          <a
+            href="javascript:void(0)"
+            @click=${(event: Event) => {
+              event.preventDefault();
+              backToWeeklyView();
+            }}
+            >Weekly view</a
+          >
+          <a href="javascript:void(0)" aria-current="page">${topicOf(task)}</a>
         </sl-breadcrumbs>
 
         <div class="task-detail__title-row">
