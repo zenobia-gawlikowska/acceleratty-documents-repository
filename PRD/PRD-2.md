@@ -9,7 +9,7 @@ Study Companion
 ---
 
 ## 1. Overview
-This project aims to create a tool that supports learning organization through task &amp; deadline visualization and study planning. The solution is intended to reduce information chaos and strengthen students’ consistency.
+This project aims to create a tool that supports learning organization through task &amp; deadline visualization and study planning. The solution is intended to reduce information chaos and strengthen students’ consistency. **Users' ages: 12–15.**
 A key requirement from the start is digital accessibility compliant with WCAG 2.2 AA level.
 
 ## 2. Goals &amp; Success Metrics
