@@ -30,7 +30,7 @@
 
 1. Skąd zwykle wiesz, co masz zadane i kiedy masz sprawdzian?
 2. Jak teraz zapisujesz/zapamiętujesz zadania do zrobienia?
-3. Co Cię najbardziej frustruje w ogarnianiu nauki?
+3. Co Cię najbardziej stresuje w ogarnianiu nauki?
 
 ---
 
@@ -54,21 +54,21 @@
 
 ### Zadanie 1 – Co mam na jutro? (2–3 min)
 **Kontekst:** Wtorek wieczór.  
-**Zadanie:** Sprawdź, co masz do zrobienia na dziś i jutro.  
-**Sukces:** Odnajduje widok krótkiej perspektywy.
+**Zadanie:** Sprawdź, co masz do zrobienia na dziś i jutro. Opowiedz jak rozumiesz wszystkie znaczki i ikonki związane z tym wydarzeniem?
+Co jest dla Ciebie trudne? Czego nie rozumiałaś?
 
 ### Zadanie 2 – Filtrowanie (3 min)
 **Zadanie:** Pokaż tylko sprawdziany z matematyki, które są jeszcze do zrobienia.  
-**Sukces:** Używa filtrów: przedmiot + typ + status.
+Opowiedz jak oceniasz to zadanie, wiedziałaś/eś jak to zrobić?
 
 ### Zadanie 3 – Odhaczenie zadania (2 min)
-**Zadanie:** Właśnie skończyłeś/aś zadanie z polskiego. Oznacz je jako zrobione.  
-**Sukces:** Zmienia status i zauważa odświeżenie listy.
+**Zadanie:** Właśnie skończyłeś/aś zadanie z polskiego. Jak zaznaczysz, że jest już zrobione? Co chciałabyś, żeby stało się z tym zadaniem jak już się nauczysz? A jeśli jego data minęła? Czy powinno zniknąć?
+
 
 ### Zadanie 4 – Materiały do nauki (3 min)
-**Zadanie:** Masz sprawdzian z biologii. Znajdź w aplikacji materiały, które Ci pomogą się przygotować.  
-**Sukces:** Wchodzi w szczegóły wydarzenia i otwiera materiał.
+**Zadanie:** Masz sprawdzian z biologii. Znajdź w aplikacji materiały, które Ci pomogą się przygotować. Jak oceniasz łatwość ich znalezienia? Co jeszcze chciałabyś tutaj zobaczyć, żeby Ci to pomogło? Czy gdybyś mogła to byś dokładała swoje materiały czy nie? Dlaczego?
 
+OK, to już wszysktie zadania. Teraz krótko sobie podsumujmy jak Ci się korzystało z aplikacji i co chciałabyś zmienić?
 ---
 
 ## 5. Debrief (3 min)
