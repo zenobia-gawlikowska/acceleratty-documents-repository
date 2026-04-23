@@ -12,13 +12,7 @@ Każda istotna zmiana w artefakcie:
 - wszystkie zmiany w designie są istotne (poza kosmetycznymi typu zmiana paddingu)
 - zmiana w kodzie/test case nie jest istotną zmianą
 
-Musi być widoczna w AcceleraTTy.
-Jest ogłoszona przez autora na kanale slackowym w wątku 'ZMIANY'
-
-Czas pracy dzielimy na 'rozmowę' i 'skupienie'. 'Skupienie' trwa 30 minut - i wówczas nie informujemy się o zmianach, żeby się nie rozpraszać. Po 30 minutach synchronizujemy się odpowiadając na pytania: 
-- czy odkryłem/odkryłam coś nowego?
-- czy zmieniłem któryś artefakt? jeśli tak, jakie to może mieć znaczenie na pracę pozostałych?
-- czas do konca skupienia odmierzany jest na miro
+Musi być widoczna w AcceleraTTy. Jeśli może mieć znaczenie dla innych - dodaj wiadomość w dedykowanym wątku na slacku.
 
 ## 3. Nie czekamy na „handoff”
 
@@ -67,5 +61,5 @@ Jeśli decyzja:
 
 Wszyscy przerywają wówczas pracę nad zadaniami aż uznamy, że temat jest zaadresowany.
 
-## 8. Pain points
+## 8. Pain points & gain points
 Zbieramy pain pointy i gain pointy - momenty procesu, w których czujemy się inaczej niż w standardowym procesie.
