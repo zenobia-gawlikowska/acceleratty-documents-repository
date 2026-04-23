@@ -5,7 +5,8 @@
 **Date:** 4/22/2026
 
 
-![screenshot-20260422203330098](/api/file/raw?path=screenshot-20260422203330098.png)
+![screenshot-20260423074859279](/api/file/raw?path=Development%2Fscreenshot-20260423074859279.png)
+
 
 What the page implements
 User story chosen: *"As a student, I want to see all tasks for the week in a clear view, so I can plan my study time and priorities quickly."*
