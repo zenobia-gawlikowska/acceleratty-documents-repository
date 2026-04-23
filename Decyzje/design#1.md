@@ -78,11 +78,13 @@ https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-i
 
 Empty state added
 - no events on any of the days https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=865-3067&t=9mUbg34NQE9RlRCg-1
+- in empty state there's no filters and search
 
 Welcome message change
 - avatar XL + welcome message change
 - always to be present on this screen
 - bear in mind that Hello user is a H2, Get ready... is a H1
+
 Changes visible here
 
 https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=873-5462&t=9mUbg34NQE9RlRCg-1
