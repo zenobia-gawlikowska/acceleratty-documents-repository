@@ -78,12 +78,33 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 [ ] NFR-01: Accessibility (WCAG 2.2 AA)
 - Full keyboard support (no focus traps), visible focus and compliant focus appearance.
 - No reliance on color alone; text and UI component contrast meets AA requirements.
-- Supports text resizing up to 200% and responsive layouts.
+- Supports text resizing up to 200%.
 - Supports “prefers-reduced-motion”.
 - Touch/Click target sizes meet WCAG 2.2 (Target Size).
 - Correct semantics and compatibility with screen readers on key flows (NVDA/VoiceOver depending on platform).
 - Filtering, sorting, searching, empty states, and status updates are fully accessible (proper labels, keyboard operability, and announced changes).
 
+[ ] NFR-02: Dark mode
+- Provide both light and dark themes for the entire application UI.
+- Respect the user's system preference via `prefers-color-scheme` by default.
+- Allow users to manually override the theme (light / dark / system) with the choice persisted across sessions.
+- Both light and dark themes must satisfy the accessibility requirements defined in NFR-01 (contrast, focus indicators, no color-only information).
+- Images, icons, and status indicators remain legible and distinguishable in both themes.
+
+[ ] NFR-03: Responsiveness (multi-device support)
+- Fully responsive layout supporting mobile, tablet, and desktop viewports.
+- Mobile-first approach: core user journeys (browsing, filtering, searching, completing tasks) are fully usable on small screens without horizontal scrolling.
+- Layout adapts gracefully to portrait and landscape orientations.
+- No loss of functionality or content across supported viewport sizes.
+- Tested on latest two versions of major browsers (Chrome, Edge, Firefox, Safari) on desktop and mobile.
+
+[ ] NFR-04: Sanoma Learning Design System
+- Use Sanoma Learning Design System (SLDS) components as the primary UI building blocks for all screens and flows.
+- Follow SLDS design tokens (colors, typography, spacing, elevation, radius) for both light and dark themes rather than defining ad-hoc values.
+- Use SLDS patterns and guidelines for common UI elements: buttons, inputs, forms, lists, cards, dialogs, navigation, empty states, and status indicators.
+- Custom components are only allowed when an equivalent SLDS component does not exist; custom components must visually and behaviorally align with SLDS guidelines and meet the accessibility requirements defined in NFR-01.
+- Icons, illustrations, and typography follow SLDS asset libraries and branding guidelines.
+- Keep the SLDS dependency up to date (within the supported version range) to benefit from accessibility and visual consistency improvements.
 
 ## 5. Out of Scope
 - Integrations with e-gradebooks / LMS (automatic assignment import) — later phase.
