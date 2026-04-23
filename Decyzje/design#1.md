@@ -88,3 +88,8 @@ Welcome message change
 Changes visible here
 
 https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=873-5462&t=9mUbg34NQE9RlRCg-1
+
+## Detailed view for element
+
+Next screen of the flow is ready 
+https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=869-3334&t=7OADhkyGImCYrP3w-11
