@@ -67,3 +67,11 @@ https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-i
 5. Events in done and after date status stay on the list
 6. No weekend days
 7. Empty state for days with no events
+
+
+Change of panel element 
+1. Event title need to me more visible & become heading of the event screen
+2. Panel heading should contain now: Event icon, event title, event type and difficulty + status
+
+New component created here:
+https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=869-10301&t=9mUbg34NQE9RlRCg-1
