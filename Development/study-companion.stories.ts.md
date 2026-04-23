@@ -7,13 +7,15 @@ import {
   faHeadSideSpeak,
   faPalette,
   faPenField,
-  faTimer
+  faTimer,
+  faXmark
 } from '@fortawesome/pro-regular-svg-icons';
 import '@sl-design-system/avatar/register.js';
 import '@sl-design-system/badge/register.js';
 import '@sl-design-system/button/register.js';
 import '@sl-design-system/button-bar/register.js';
 import '@sl-design-system/date-field/register.js';
+import '@sl-design-system/form/register.js';
 import { Icon } from '@sl-design-system/icon';
 import '@sl-design-system/icon/register.js';
 import '@sl-design-system/listbox/register.js';
@@ -24,7 +26,18 @@ import '@sl-design-system/tooltip/register.js';
 import { type StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 
-Icon.register(faBook, faCalculator, faFilePen, faFlask, faGlobe, faHeadSideSpeak, faPalette, faPenField, faTimer);
+Icon.register(
+  faBook,
+  faCalculator,
+  faFilePen,
+  faFlask,
+  faGlobe,
+  faHeadSideSpeak,
+  faPalette,
+  faPenField,
+  faTimer,
+  faXmark
+);
 
 type Story = StoryObj;
 
@@ -194,6 +207,15 @@ const eventTypeIcons: Record<string, string> = {
   'written-assignment': 'far-file-pen'
 };
 
+// Extract an ISO date string (YYYY-MM-DD) from a day.dateLabel like
+// "Thursday (23/04/2026)". Used to filter tasks by the From/To date pickers.
+const parseDayDate = (dateLabel: string): string => {
+  const match = /\((\d{2})\/(\d{2})\/(\d{4})\)/.exec(dateLabel);
+  if (!match) return '';
+  const [, day, month, year] = match;
+  return `${year}-${month}-${day}`;
+};
+
 const topicSlug = (topic: string) =>
   topic
     .toLowerCase()
@@ -228,7 +250,7 @@ const taskAction = (task: Task) => {
   `;
 };
 
-const taskPanel = (task: Task) => {
+const taskPanel = (task: Task, isoDate: string) => {
   const typeSlug = topicSlug(typeOf(task));
   const prefixIcon = eventTypeIcons[typeSlug] ?? task.subject.iconName;
 
@@ -241,6 +263,7 @@ const taskPanel = (task: Task) => {
       data-status=${task.status}
       data-topic=${topicSlug(topicOf(task))}
       data-type=${typeSlug}
+      data-date=${isoDate}
       divider
     >
       <sl-icon slot="prefix" name=${prefixIcon}></sl-icon>
@@ -265,18 +288,20 @@ const taskPanel = (task: Task) => {
   `;
 };
 
-const daySection = (day: (typeof week)[number]) =>
-  day.tasks.length === 0
+const daySection = (day: (typeof week)[number]) => {
+  const isoDate = parseDayDate(day.dateLabel);
+  return day.tasks.length === 0
     ? null
     : html`
-        <section class="day-section" data-day=${day.dayLabel}>
+        <section class="day-section" data-day=${day.dayLabel} data-date=${isoDate}>
           <header class="day-section__header">
             <span class="day-section__label">${day.dayLabel}</span>
             <span class="day-section__date">${day.dateLabel}</span>
           </header>
-          <div class="day-section__tasks">${day.tasks.map(taskPanel)}</div>
+          <div class="day-section__tasks">${day.tasks.map(t => taskPanel(t, isoDate))}</div>
         </section>
       `;
+};
 
 export default {
   title: 'Examples/Study Companion'
@@ -318,6 +343,17 @@ export const WeeklyView: Story = {
       const statusValue = selects[2]?.value ?? 'all';
       const difficultyValue = selects[3]?.value ?? 'all';
 
+      const dateFields = toolbar.querySelectorAll<HTMLElement & { value?: Date }>('sl-date-field');
+      const toIso = (d?: Date) => {
+        if (!d) return '';
+        const y = d.getFullYear(),
+          m = String(d.getMonth() + 1).padStart(2, '0'),
+          day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      };
+      const fromIso = toIso(dateFields[0]?.value);
+      const toIsoStr = toIso(dateFields[1]?.value);
+
       const taskMatches = (t: HTMLElement) => {
         const heading = (t.querySelector('[slot="heading"]')?.textContent ?? '').toLowerCase();
         const subjectLabel = (t.dataset.subject ?? '').toLowerCase();
@@ -325,12 +361,15 @@ export const WeeklyView: Story = {
         const priority = t.dataset.priority ?? '';
         const status = t.dataset.status ?? '';
         const type = t.dataset.type ?? '';
+        const date = t.dataset.date ?? '';
 
         if (query && !heading.includes(query) && !subjectLabel.includes(query)) return false;
         if (subjectValue !== 'all' && subjectKey !== subjectValue) return false;
         if (eventTypeValue !== 'all' && type !== eventTypeValue) return false;
         if (statusValue !== 'all' && status !== statusValue) return false;
         if (difficultyValue !== 'all' && priority !== difficultyToPriority[difficultyValue]) return false;
+        if (fromIso && date && date < fromIso) return false;
+        if (toIsoStr && date && date > toIsoStr) return false;
 
         return true;
       };
@@ -348,11 +387,36 @@ export const WeeklyView: Story = {
       dayVisibility.forEach((visible, day) => {
         day.style.display = visible ? '' : 'none';
       });
+
+      // Show the empty state when no task panel is currently visible.
+      const anyVisible = Array.from(taskPanels).some(t => t.style.display !== 'none');
+      const emptyState = root.querySelector<HTMLElement>('.empty-state');
+      if (emptyState) emptyState.hidden = anyVisible;
     };
 
     const applyFilters = (event: Event) => {
       const root = (event.target as HTMLElement).closest('.study-dashboard');
       if (root) applyFiltersToRoot(root);
+    };
+
+    const resetFilters = (event: Event) => {
+      const root = (event.target as HTMLElement).closest('.study-dashboard');
+      if (!root) return;
+      const toolbar = root.querySelector('.dashboard-toolbar');
+      if (!toolbar) return;
+
+      const searchField = toolbar.querySelector<HTMLInputElement & { value: string }>('sl-search-field');
+      if (searchField) searchField.value = '';
+
+      toolbar.querySelectorAll<HTMLElement & { value?: string }>('sl-select').forEach(s => {
+        s.value = 'all';
+      });
+
+      toolbar.querySelectorAll<HTMLElement & { value?: Date }>('sl-date-field').forEach(d => {
+        d.value = undefined;
+      });
+
+      applyFiltersToRoot(root);
     };
 
     return html`
@@ -428,6 +492,7 @@ export const WeeklyView: Story = {
         .dashboard-toolbar {
           display: grid;
           gap: 1rem;
+          container-type: inline-size;
         }
         .toolbar-search {
           display: grid;
@@ -436,18 +501,35 @@ export const WeeklyView: Story = {
           align-items: end;
         }
         .toolbar-selects {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 0.5rem;
-        }
-        .toolbar-dates {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr)) 1fr;
+          display: flex;
+          flex-wrap: wrap;
           gap: 0.5rem;
           align-items: end;
         }
+        .toolbar-selects > sl-form-field {
+          flex: 1 1 9rem;
+          min-inline-size: 9rem;
+        }
+        .toolbar-selects sl-select {
+          inline-size: 100%;
+          min-inline-size: 0;
+        }
+        .reset-filters {
+          align-self: end;
+          flex: 0 0 auto;
+        }
+        .toolbar-dates {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          align-items: end;
+        }
+        .toolbar-dates > sl-date-field {
+          flex: 1 1 12rem;
+          min-inline-size: 10rem;
+        }
         .toolbar-dates > :last-child {
-          /* spacer so the two date fields keep their natural width */
+          display: none;
         }
         .day-section {
           display: grid;
@@ -470,6 +552,32 @@ export const WeeklyView: Story = {
         .day-section__tasks {
           display: grid;
           gap: 1rem;
+        }
+        /* Empty state shown when search/filters produce no matching events.
+           Figma: Multitenant materials, node 834:20132. */
+        .empty-state {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+          padding-block: 20px;
+          padding-inline: 20px;
+          background: #fff;
+          border: 1px solid #d0d9e0;
+          border-radius: 4px;
+          color: #000;
+          text-align: center;
+          font: var(--sl-text-body-md);
+          line-height: 20px;
+        }
+        .empty-state[hidden] {
+          display: none;
+        }
+        .empty-state__image {
+          inline-size: 92px;
+          block-size: 80px;
+          object-fit: contain;
+          flex: 0 0 auto;
         }
         /* Kid-friendly: rounder panels, softer shadows, chunkier spacing */
         .study-dashboard sl-panel {
@@ -537,15 +645,6 @@ export const WeeklyView: Story = {
           color: var(--sl-color-foreground-bold);
         }
         @media (max-inline-size: 720px) {
-          .toolbar-selects {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-          .toolbar-dates {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-          .toolbar-dates > :last-child {
-            display: none;
-          }
           .task-panel::part(header) {
             padding: 12px 12px 12px 16px;
           }
@@ -564,11 +663,8 @@ export const WeeklyView: Story = {
           .toolbar-search {
             grid-template-columns: 1fr;
           }
-          .toolbar-selects {
-            grid-template-columns: 1fr;
-          }
-          .toolbar-dates {
-            grid-template-columns: 1fr;
+          .reset-filters {
+            flex: 1 1 100%;
           }
           .task-heading__title {
             font-size: 15px;
@@ -619,46 +715,70 @@ export const WeeklyView: Story = {
           </div>
 
           <div class="toolbar-selects">
-            <sl-select aria-label="Filter by subject" placeholder="Subject" @sl-change=${applyFilters}>
-              <sl-option value="all">All subjects</sl-option>
-              ${subjects.map(
-                s => html`
-                  <sl-option value=${s.key}>
-                    <sl-icon name=${s.iconName} slot="prefix"></sl-icon>
-                    ${s.label}
-                  </sl-option>
-                `
-              )}
-            </sl-select>
+            <sl-form-field label="Subject">
+              <sl-select aria-label="Filter by subject" placeholder="Subject" @sl-change=${applyFilters}>
+                <sl-option value="all">All subjects</sl-option>
+                ${subjects.map(
+                  s => html`
+                    <sl-option value=${s.key}>
+                      <sl-icon name=${s.iconName} slot="prefix"></sl-icon>
+                      ${s.label}
+                    </sl-option>
+                  `
+                )}
+              </sl-select>
+            </sl-form-field>
 
-            <sl-select aria-label="Filter by event type" placeholder="Event type" @sl-change=${applyFilters}>
-              <sl-option value="all">All types</sl-option>
-              ${allEventTypes.map(t => html`<sl-option value=${t.slug}>${t.label}</sl-option>`)}
-            </sl-select>
+            <sl-form-field label="Event type">
+              <sl-select aria-label="Filter by event type" placeholder="Event type" @sl-change=${applyFilters}>
+                <sl-option value="all">All types</sl-option>
+                ${allEventTypes.map(t => html`<sl-option value=${t.slug}>${t.label}</sl-option>`)}
+              </sl-select>
+            </sl-form-field>
 
-            <sl-select aria-label="Filter by status" placeholder="Status" @sl-change=${applyFilters}>
-              <sl-option value="all">All statuses</sl-option>
-              <sl-option value="todo">To do</sl-option>
-              <sl-option value="in-progress">In progress</sl-option>
-              <sl-option value="done">Done</sl-option>
-            </sl-select>
+            <sl-form-field label="Status">
+              <sl-select aria-label="Filter by status" placeholder="Status" @sl-change=${applyFilters}>
+                <sl-option value="all">All statuses</sl-option>
+                <sl-option value="todo">To do</sl-option>
+                <sl-option value="in-progress">In progress</sl-option>
+                <sl-option value="done">Done</sl-option>
+              </sl-select>
+            </sl-form-field>
 
-            <sl-select aria-label="Filter by difficulty" placeholder="Difficulty" @sl-change=${applyFilters}>
-              <sl-option value="all">All difficulties</sl-option>
-              <sl-option value="easy">Easy 🌶️</sl-option>
-              <sl-option value="medium">Medium 🌶️🌶️</sl-option>
-              <sl-option value="hard">Hard 🌶️🌶️🌶️</sl-option>
-            </sl-select>
+            <sl-form-field label="Difficulty">
+              <sl-select aria-label="Filter by difficulty" placeholder="Difficulty" @sl-change=${applyFilters}>
+                <sl-option value="all">All difficulties</sl-option>
+                <sl-option value="easy">Easy 🌶️</sl-option>
+                <sl-option value="medium">Medium 🌶️🌶️</sl-option>
+                <sl-option value="hard">Hard 🌶️🌶️🌶️</sl-option>
+              </sl-select>
+            </sl-form-field>
+
+            <sl-button
+              class="reset-filters"
+              aria-label="Reset filters"
+              variant="primary"
+              fill="outline"
+              @click=${resetFilters}
+            >
+              <sl-icon slot="prefix" name="far-xmark"></sl-icon>
+              Reset filters
+            </sl-button>
           </div>
 
           <div class="toolbar-dates">
-            <sl-date-field label="From date"></sl-date-field>
-            <sl-date-field label="To date"></sl-date-field>
+            <sl-date-field label="From date" @sl-change=${applyFilters}></sl-date-field>
+            <sl-date-field label="To date" @sl-change=${applyFilters}></sl-date-field>
             <span aria-hidden="true"></span>
           </div>
         </div>
 
         <div class="week-days">${week.map(daySection)}</div>
+
+        <div class="empty-state" role="status" aria-live="polite" hidden>
+          <p>No events match your search</p>
+          <img class="empty-state__image" src="/images/study-companion/charco-pet.png" alt="" aria-hidden="true" />
+        </div>
       </main>
     `;
   }
