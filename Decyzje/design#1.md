@@ -54,3 +54,16 @@ level of difficulty for an element is marked via chilli pepper
 - 3 chilli pepper - hard
 
 System based on what is actually used by teachers in schools, when creating assignment with different level of difficulty 
+
+Main dashboard approved
+
+https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=834-31846&t=iaa06oAvEZkchZDD-1
+https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=834-9480&t=iaa06oAvEZkchZDD-1
+
+1. Heading 1: Your upcoming events
+2. Search (subject, description)
+3. Multiselects: Subject, Event type, Status, Difficulty (can be used individually or combined)
+4. Events displayed by dates
+5. Events in done and after date status stay on the list
+6. No weekend days
+7. Empty state for days with no events
