@@ -35,7 +35,7 @@ test.describe('Study Companion Weekly View', () => {
   test('can use filter by Difficulty', async ({ page }) => {
     const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
 
-    const select = preview.getByRole('combobox', { name: 'Filter by difficulty' });
+    const select = preview.getByRole('combobox', { name: 'Difficulty' });
     await select.waitFor({ state: 'visible', timeout: 5000 });
 
     await select.click();
@@ -50,7 +50,7 @@ test.describe('Study Companion Weekly View', () => {
   test('can use filter by Subject', async ({ page }) => {
     const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
 
-    const select = preview.getByRole('combobox', { name: 'Filter by subject' });
+    const select = preview.getByRole('combobox', { name: 'Subject' });
     await select.waitFor({ state: 'visible', timeout: 5000 });
 
     await select.click();
@@ -67,7 +67,7 @@ test.describe('Study Companion Weekly View', () => {
   test('can use filter by Event type', async ({ page }) => {
     const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
 
-    const select = preview.getByRole('combobox', { name: 'Filter by event type' });
+    const select = preview.getByRole('combobox', { name: 'Event type' });
     await select.waitFor({ state: 'visible', timeout: 5000 });
 
     await select.click();
@@ -78,5 +78,23 @@ test.describe('Study Companion Weekly View', () => {
     await expect(preview.locator('sl-panel[data-type="exam"]').first()).toBeHidden();
     await expect(preview.locator('sl-panel[data-type="oral-exam"]').first()).toBeHidden();
     await expect(preview.locator('sl-panel[data-type="written-assignment"]').first()).toBeHidden();
+  });
+
+  test('can change to dark mode', async ({ page }) => {
+    // Load the story in light mode directly via iframe.html (no Storybook chrome).
+    await page.goto(
+      'http://localhost:6006/iframe.html?id=examples-study-companion--weekly-view&viewMode=story&globals=mode:light',
+      { waitUntil: 'networkidle' }
+    );
+    await page.getByText('Quadratic equations', { exact: true }).first().waitFor({ state: 'visible', timeout: 5000 });
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+
+    // Navigate with dark mode global
+    await page.goto(
+      'http://localhost:6006/iframe.html?id=examples-study-companion--weekly-view&viewMode=story&globals=mode:dark',
+      { waitUntil: 'networkidle' }
+    );
+    await page.getByText('Quadratic equations', { exact: true }).first().waitFor({ state: 'visible', timeout: 5000 });
+    await expect(page.locator('body')).not.toHaveCSS('background-color', 'rgb(255, 255, 255)');
   });
 });

@@ -30,6 +30,7 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 |    Student     |      browse tasks in a short perspective (today–tomorrow)       |  I can focus on what’s next right away         |
 |    Student     |      browse tasks in a long perspective (next week)       |  I can anticipate workload and deadlines         |
 |    Student     |      filter and sort events by subject, difficulty, date, event type, and status       |  I can quickly narrow down to what matters         |
+|    Student     |      reset all applied filters at once       |  I can quickly return to the full list of events without clearing each filter manually         |
 |    Student     |      search events by text (subject and description fragment)       |  I can find specific items without scrolling         |
 |    Student     |      mark a task as done and see the list refresh       |  my current workload is always up to date         |
 |    Student     |      access educational materials from Sanoma products linked to events/tasks       |  I can study the relevant content without searching elsewhere         |
@@ -53,6 +54,8 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
   - date
   - event type (exam, test, oral exam, written assignment)
   - status (to do, in progress, after deadline, done)
+- Provide a "Reset filters" action that clears all applied filters at once and restores the default (unfiltered) view.
+  - The action is only enabled when at least one filter is active.
 
 [ ] FR-03: Search (text)
 - Enable text search for events by:

@@ -1,12 +1,20 @@
-# Angular Component
+# Study Companion
 
 **Component:**
 **Module:**
 **Date:** 4/22/2026
 
+## Desktop
 
-![screenshot-20260423112200469](/api/file/raw?path=Development%2Fscreenshot-20260423112200469.png)
+![screenshot-20260423144737687](/api/file/raw?path=Development%2Fscreenshot-20260423144737687.png)
 
+## Mobile
+
+![screenshot-20260423144814384](/api/file/raw?path=Development%2Fscreenshot-20260423144814384.png)
+
+## Dark Mode
+
+![screenshot-20260423150121003](/api/file/raw?path=Development%2Fscreenshot-20260423150121003.png)
 
 
 What the page implements

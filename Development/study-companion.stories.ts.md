@@ -1,32 +1,55 @@
 import {
+  faArrowLeft,
   faBook,
   faCalculator,
+  faClock,
   faFilePen,
   faFlask,
   faGlobe,
   faHeadSideSpeak,
   faPalette,
   faPenField,
-  faTimer
+  faPenToSquare,
+  faTimer,
+  faXmark
 } from '@fortawesome/pro-regular-svg-icons';
 import '@sl-design-system/avatar/register.js';
 import '@sl-design-system/badge/register.js';
+import '@sl-design-system/breadcrumbs/register.js';
 import '@sl-design-system/button/register.js';
 import '@sl-design-system/button-bar/register.js';
+import '@sl-design-system/card/register.js';
 import '@sl-design-system/date-field/register.js';
+import '@sl-design-system/form/register.js';
 import { Icon } from '@sl-design-system/icon';
 import '@sl-design-system/icon/register.js';
 import '@sl-design-system/listbox/register.js';
 import '@sl-design-system/panel/register.js';
+import '@sl-design-system/progress-bar/register.js';
 import '@sl-design-system/search-field/register.js';
 import '@sl-design-system/select/register.js';
 import '@sl-design-system/tooltip/register.js';
 import { type StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 
-Icon.register(faBook, faCalculator, faFilePen, faFlask, faGlobe, faHeadSideSpeak, faPalette, faPenField, faTimer);
+Icon.register(
+  faArrowLeft,
+  faBook,
+  faCalculator,
+  faClock,
+  faFilePen,
+  faFlask,
+  faGlobe,
+  faHeadSideSpeak,
+  faPalette,
+  faPenField,
+  faPenToSquare,
+  faTimer,
+  faXmark
+);
 
 type Story = StoryObj;
+type TaskDetailArgs = { taskId: string };
 
 type Subject = {
   key: string;
@@ -194,6 +217,15 @@ const eventTypeIcons: Record<string, string> = {
   'written-assignment': 'far-file-pen'
 };
 
+// Extract an ISO date string (YYYY-MM-DD) from a day.dateLabel like
+// "Thursday (23/04/2026)". Used to filter tasks by the From/To date pickers.
+const parseDayDate = (dateLabel: string): string => {
+  const match = /\((\d{2})\/(\d{2})\/(\d{4})\)/.exec(dateLabel);
+  if (!match) return '';
+  const [, day, month, year] = match;
+  return `${year}-${month}-${day}`;
+};
+
 const topicSlug = (topic: string) =>
   topic
     .toLowerCase()
@@ -214,21 +246,55 @@ const allEventTypes: Array<{ slug: string; label: string }> = Array.from(
   .map(([slug, label]) => ({ slug, label }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
+// Navigate to the TaskDetail story, passing the task id via Storybook's `args`
+// URL param so the detail view can look the task up.
+const openTaskDetail = (taskId: string) => {
+  try {
+    const parentLoc = window.parent.location;
+    const url = new URL(parentLoc.href);
+    url.searchParams.set('path', '/story/examples-study-companion--task-detail');
+    url.searchParams.set('args', `taskId:${taskId}`);
+    parentLoc.href = url.toString();
+  } catch {
+    window.location.search = `?id=examples-study-companion--task-detail&viewMode=story&args=taskId:${taskId}`;
+  }
+};
+
+const backToWeeklyView = () => {
+  try {
+    const parentLoc = window.parent.location;
+    const url = new URL(parentLoc.href);
+    url.searchParams.set('path', '/story/examples-study-companion--weekly-view');
+    url.searchParams.delete('args');
+    parentLoc.href = url.toString();
+  } catch {
+    window.location.search = '?id=examples-study-companion--weekly-view&viewMode=story';
+  }
+};
+
 const taskAction = (task: Task) => {
   if (task.status === 'done') return null;
+  const topic = topicOf(task);
+  const open = () => openTaskDetail(task.id);
   if (task.status === 'in-progress') {
-    return html`
-      <sl-tooltip id=${`tt-continue-${task.id}`} position="top">Pick up where you left off</sl-tooltip>
-      <sl-button fill="link" aria-describedby=${`tt-continue-${task.id}`}>Continue</sl-button>
-    `;
+    return html` <sl-button fill="link" aria-label=${`Continue ${topic}`} @click=${open}>Continue</sl-button> `;
   }
   return html`
-    <sl-tooltip id=${`tt-start-${task.id}`} position="top">Jump in and start this one</sl-tooltip>
-    <sl-button variant="primary" shape="pill" aria-describedby=${`tt-start-${task.id}`}>Start</sl-button>
+    <sl-button variant="primary" shape="pill" aria-label=${`Start ${topic}`} @click=${open}>Start</sl-button>
   `;
 };
 
-const taskPanel = (task: Task) => {
+const allTasks: Task[] = week.flatMap(d => d.tasks);
+const findTask = (taskId: string): Task | undefined => allTasks.find(t => t.id === taskId);
+const findDayForTask = (taskId: string) => week.find(d => d.tasks.some(t => t.id === taskId));
+
+const difficultyLabel = (priority: Task['priority']) => {
+  if (priority === 'high') return 'Hard';
+  if (priority === 'normal') return 'Medium';
+  return 'Easy';
+};
+
+const taskPanel = (task: Task, isoDate: string) => {
   const typeSlug = topicSlug(typeOf(task));
   const prefixIcon = eventTypeIcons[typeSlug] ?? task.subject.iconName;
 
@@ -241,6 +307,7 @@ const taskPanel = (task: Task) => {
       data-status=${task.status}
       data-topic=${topicSlug(topicOf(task))}
       data-type=${typeSlug}
+      data-date=${isoDate}
       divider
     >
       <sl-icon slot="prefix" name=${prefixIcon}></sl-icon>
@@ -265,18 +332,20 @@ const taskPanel = (task: Task) => {
   `;
 };
 
-const daySection = (day: (typeof week)[number]) =>
-  day.tasks.length === 0
+const daySection = (day: (typeof week)[number]) => {
+  const isoDate = parseDayDate(day.dateLabel);
+  return day.tasks.length === 0
     ? null
     : html`
-        <section class="day-section" data-day=${day.dayLabel}>
+        <section class="day-section" data-day=${day.dayLabel} data-date=${isoDate}>
           <header class="day-section__header">
             <span class="day-section__label">${day.dayLabel}</span>
             <span class="day-section__date">${day.dateLabel}</span>
           </header>
-          <div class="day-section__tasks">${day.tasks.map(taskPanel)}</div>
+          <div class="day-section__tasks">${day.tasks.map(t => taskPanel(t, isoDate))}</div>
         </section>
       `;
+};
 
 export default {
   title: 'Examples/Study Companion'
@@ -318,6 +387,17 @@ export const WeeklyView: Story = {
       const statusValue = selects[2]?.value ?? 'all';
       const difficultyValue = selects[3]?.value ?? 'all';
 
+      const dateFields = toolbar.querySelectorAll<HTMLElement & { value?: Date }>('sl-date-field');
+      const toIso = (d?: Date) => {
+        if (!d) return '';
+        const y = d.getFullYear(),
+          m = String(d.getMonth() + 1).padStart(2, '0'),
+          day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      };
+      const fromIso = toIso(dateFields[0]?.value);
+      const toIsoStr = toIso(dateFields[1]?.value);
+
       const taskMatches = (t: HTMLElement) => {
         const heading = (t.querySelector('[slot="heading"]')?.textContent ?? '').toLowerCase();
         const subjectLabel = (t.dataset.subject ?? '').toLowerCase();
@@ -325,12 +405,15 @@ export const WeeklyView: Story = {
         const priority = t.dataset.priority ?? '';
         const status = t.dataset.status ?? '';
         const type = t.dataset.type ?? '';
+        const date = t.dataset.date ?? '';
 
         if (query && !heading.includes(query) && !subjectLabel.includes(query)) return false;
         if (subjectValue !== 'all' && subjectKey !== subjectValue) return false;
         if (eventTypeValue !== 'all' && type !== eventTypeValue) return false;
         if (statusValue !== 'all' && status !== statusValue) return false;
         if (difficultyValue !== 'all' && priority !== difficultyToPriority[difficultyValue]) return false;
+        if (fromIso && date && date < fromIso) return false;
+        if (toIsoStr && date && date > toIsoStr) return false;
 
         return true;
       };
@@ -348,11 +431,36 @@ export const WeeklyView: Story = {
       dayVisibility.forEach((visible, day) => {
         day.style.display = visible ? '' : 'none';
       });
+
+      // Show the empty state when no task panel is currently visible.
+      const anyVisible = Array.from(taskPanels).some(t => t.style.display !== 'none');
+      const emptyState = root.querySelector<HTMLElement>('.empty-state');
+      if (emptyState) emptyState.hidden = anyVisible;
     };
 
     const applyFilters = (event: Event) => {
       const root = (event.target as HTMLElement).closest('.study-dashboard');
       if (root) applyFiltersToRoot(root);
+    };
+
+    const resetFilters = (event: Event) => {
+      const root = (event.target as HTMLElement).closest('.study-dashboard');
+      if (!root) return;
+      const toolbar = root.querySelector('.dashboard-toolbar');
+      if (!toolbar) return;
+
+      const searchField = toolbar.querySelector<HTMLInputElement & { value: string }>('sl-search-field');
+      if (searchField) searchField.value = '';
+
+      toolbar.querySelectorAll<HTMLElement & { value?: string }>('sl-select').forEach(s => {
+        s.value = 'all';
+      });
+
+      toolbar.querySelectorAll<HTMLElement & { value?: Date }>('sl-date-field').forEach(d => {
+        d.value = undefined;
+      });
+
+      applyFiltersToRoot(root);
     };
 
     return html`
@@ -363,7 +471,7 @@ export const WeeklyView: Story = {
           justify-content: space-between;
           gap: 1rem;
           padding: 8px clamp(1rem, 4vw, 64px);
-          background: #fff;
+          background: var(--sl-color-background-plain);
           box-shadow:
             0 1px 1px rgba(0, 0, 0, 0.09),
             0 3px 2px rgba(0, 0, 0, 0.05);
@@ -399,7 +507,7 @@ export const WeeklyView: Story = {
           display: flex;
           align-items: center;
           gap: 8px;
-          color: #222;
+          color: var(--sl-color-foreground-plain);
           font: var(--sl-text-body-md);
         }
         .study-dashboard {
@@ -428,6 +536,7 @@ export const WeeklyView: Story = {
         .dashboard-toolbar {
           display: grid;
           gap: 1rem;
+          container-type: inline-size;
         }
         .toolbar-search {
           display: grid;
@@ -436,18 +545,39 @@ export const WeeklyView: Story = {
           align-items: end;
         }
         .toolbar-selects {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 0.5rem;
-        }
-        .toolbar-dates {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr)) 1fr;
+          display: flex;
+          flex-wrap: wrap;
           gap: 0.5rem;
           align-items: end;
         }
+        .toolbar-selects > sl-form-field {
+          flex: 1 1 9rem;
+          min-inline-size: 9rem;
+        }
+        .toolbar-selects sl-select {
+          inline-size: 100%;
+          min-inline-size: 0;
+        }
+        .reset-filters {
+          align-self: end;
+          flex: 0 0 auto;
+        }
+        .toolbar-dates {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          align-items: end;
+        }
+        .toolbar-dates > sl-form-field {
+          flex: 1 1 12rem;
+          min-inline-size: 10rem;
+        }
+        .toolbar-dates sl-date-field {
+          inline-size: 100%;
+          min-inline-size: 0;
+        }
         .toolbar-dates > :last-child {
-          /* spacer so the two date fields keep their natural width */
+          display: none;
         }
         .day-section {
           display: grid;
@@ -470,6 +600,40 @@ export const WeeklyView: Story = {
         .day-section__tasks {
           display: grid;
           gap: 1rem;
+        }
+        /* Empty state shown when search/filters produce no matching events.
+           Figma: Multitenant materials, node 834:20132. */
+        .empty-state {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+          padding-block: 20px;
+          padding-inline: 20px;
+          background: var(--sl-color-background-plain);
+          border: 1px solid var(--sl-color-border-plain);
+          border-radius: 4px;
+          color: var(--sl-color-foreground-plain);
+          text-align: center;
+          font: var(--sl-text-body-md);
+          line-height: 20px;
+        }
+        .empty-state[hidden] {
+          display: none;
+        }
+        .empty-state__image {
+          inline-size: 92px;
+          block-size: 80px;
+          object-fit: contain;
+          flex: 0 0 auto;
+        }
+        @media (prefers-color-scheme: dark) {
+          .empty-state__image {
+            filter: invert(1) hue-rotate(180deg);
+          }
+        }
+        :root[style*='color-scheme: dark'] .empty-state__image {
+          filter: invert(1) hue-rotate(180deg);
         }
         /* Kid-friendly: rounder panels, softer shadows, chunkier spacing */
         .study-dashboard sl-panel {
@@ -537,15 +701,6 @@ export const WeeklyView: Story = {
           color: var(--sl-color-foreground-bold);
         }
         @media (max-inline-size: 720px) {
-          .toolbar-selects {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-          .toolbar-dates {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-          .toolbar-dates > :last-child {
-            display: none;
-          }
           .task-panel::part(header) {
             padding: 12px 12px 12px 16px;
           }
@@ -564,11 +719,8 @@ export const WeeklyView: Story = {
           .toolbar-search {
             grid-template-columns: 1fr;
           }
-          .toolbar-selects {
-            grid-template-columns: 1fr;
-          }
-          .toolbar-dates {
-            grid-template-columns: 1fr;
+          .reset-filters {
+            flex: 1 1 100%;
           }
           .task-heading__title {
             font-size: 15px;
@@ -607,58 +759,438 @@ export const WeeklyView: Story = {
 
         <div class="dashboard-toolbar">
           <div class="toolbar-search">
-            <sl-search-field
-              label="Search events by subject or description"
-              placeholder="ex. biology"
-              @sl-change=${applyFilters}
-              @keydown=${(e: KeyboardEvent) => {
-                if (e.key === 'Enter') applyFilters(e);
-              }}
-            ></sl-search-field>
+            <sl-form-field label="Search events by subject or description">
+              <sl-search-field
+                placeholder="ex. biology"
+                @sl-change=${applyFilters}
+                @keydown=${(e: KeyboardEvent) => {
+                  if (e.key === 'Enter') applyFilters(e);
+                }}
+              ></sl-search-field>
+            </sl-form-field>
             <sl-button aria-label="Search" variant="primary" fill="outline" @click=${applyFilters}>Search</sl-button>
           </div>
 
           <div class="toolbar-selects">
-            <sl-select aria-label="Filter by subject" placeholder="Subject" @sl-change=${applyFilters}>
-              <sl-option value="all">All subjects</sl-option>
-              ${subjects.map(
-                s => html`
-                  <sl-option value=${s.key}>
-                    <sl-icon name=${s.iconName} slot="prefix"></sl-icon>
-                    ${s.label}
-                  </sl-option>
-                `
-              )}
-            </sl-select>
+            <sl-form-field label="Subject">
+              <sl-select aria-label="Filter by subject" placeholder="Subject" @sl-change=${applyFilters}>
+                <sl-option value="all">All subjects</sl-option>
+                ${subjects.map(
+                  s => html`
+                    <sl-option value=${s.key}>
+                      <sl-icon name=${s.iconName} slot="prefix"></sl-icon>
+                      ${s.label}
+                    </sl-option>
+                  `
+                )}
+              </sl-select>
+            </sl-form-field>
 
-            <sl-select aria-label="Filter by event type" placeholder="Event type" @sl-change=${applyFilters}>
-              <sl-option value="all">All types</sl-option>
-              ${allEventTypes.map(t => html`<sl-option value=${t.slug}>${t.label}</sl-option>`)}
-            </sl-select>
+            <sl-form-field label="Event type">
+              <sl-select aria-label="Filter by event type" placeholder="Event type" @sl-change=${applyFilters}>
+                <sl-option value="all">All types</sl-option>
+                ${allEventTypes.map(t => html`<sl-option value=${t.slug}>${t.label}</sl-option>`)}
+              </sl-select>
+            </sl-form-field>
 
-            <sl-select aria-label="Filter by status" placeholder="Status" @sl-change=${applyFilters}>
-              <sl-option value="all">All statuses</sl-option>
-              <sl-option value="todo">To do</sl-option>
-              <sl-option value="in-progress">In progress</sl-option>
-              <sl-option value="done">Done</sl-option>
-            </sl-select>
+            <sl-form-field label="Status">
+              <sl-select aria-label="Filter by status" placeholder="Status" @sl-change=${applyFilters}>
+                <sl-option value="all">All statuses</sl-option>
+                <sl-option value="todo">To do</sl-option>
+                <sl-option value="in-progress">In progress</sl-option>
+                <sl-option value="done">Done</sl-option>
+              </sl-select>
+            </sl-form-field>
 
-            <sl-select aria-label="Filter by difficulty" placeholder="Difficulty" @sl-change=${applyFilters}>
-              <sl-option value="all">All difficulties</sl-option>
-              <sl-option value="easy">Easy 🌶️</sl-option>
-              <sl-option value="medium">Medium 🌶️🌶️</sl-option>
-              <sl-option value="hard">Hard 🌶️🌶️🌶️</sl-option>
-            </sl-select>
+            <sl-form-field label="Difficulty">
+              <sl-select aria-label="Filter by difficulty" placeholder="Difficulty" @sl-change=${applyFilters}>
+                <sl-option value="all">All difficulties</sl-option>
+                <sl-option value="easy">Easy 🌶️</sl-option>
+                <sl-option value="medium">Medium 🌶️🌶️</sl-option>
+                <sl-option value="hard">Hard 🌶️🌶️🌶️</sl-option>
+              </sl-select>
+            </sl-form-field>
+
+            <sl-button
+              class="reset-filters"
+              aria-label="Reset filters"
+              variant="primary"
+              fill="outline"
+              @click=${resetFilters}
+            >
+              <sl-icon slot="prefix" name="far-xmark"></sl-icon>
+              Reset filters
+            </sl-button>
           </div>
 
           <div class="toolbar-dates">
-            <sl-date-field label="From date"></sl-date-field>
-            <sl-date-field label="To date"></sl-date-field>
+            <sl-form-field label="From date">
+              <sl-date-field @sl-change=${applyFilters}></sl-date-field>
+            </sl-form-field>
+            <sl-form-field label="To date">
+              <sl-date-field @sl-change=${applyFilters}></sl-date-field>
+            </sl-form-field>
             <span aria-hidden="true"></span>
           </div>
         </div>
 
         <div class="week-days">${week.map(daySection)}</div>
+
+        <div class="empty-state" role="status" aria-live="polite" hidden>
+          <p>No events match your search</p>
+          <img class="empty-state__image" src="/images/study-companion/charco-pet.png" alt="" aria-hidden="true" />
+        </div>
+      </main>
+    `;
+  }
+};
+
+/**
+ * User story: _As a student, I want to open an event and see a clear scope of
+ * what's expected of me, plus the learning resources I need, so I can prepare
+ * confidently and mark myself ready when I'm done._
+ *
+ * This is the destination screen for the Weekly view's Start / Continue actions.
+ * The story accepts a `taskId` arg (passed through Storybook's `args` URL
+ * parameter when navigating from the Weekly view) and resolves the matching
+ * task from the shared `week` data. If no task id is provided, it falls back
+ * to the first in-progress task so the story is directly openable.
+ *
+ * Composition (Figma: Multitenant materials, node 869:3343):
+ * - Title row — edit icon + event title + subtle status badge
+ * - Subtitle — event type + difficulty peppers
+ * - "Scope" panel — intro paragraph + numbered list of preparation steps
+ * - Resource cards — 3 sl-card's (book / video / flashcards) with image, title,
+ *   description and a primary action button
+ * - Ready panel — "Once you're ready..." prompt with an outline "I'm ready" button
+ *   that transitions the status to done and returns to the Weekly view
+ */
+export const TaskDetail: StoryObj<TaskDetailArgs> = {
+  args: { taskId: 'm1' },
+  argTypes: {
+    taskId: {
+      control: 'select',
+      options: allTasks.map(t => t.id),
+      description: 'Which task to render. Passed by the Weekly view via args.'
+    }
+  },
+  render: (args: TaskDetailArgs) => {
+    const task = findTask(args.taskId) ?? allTasks.find(t => t.status === 'in-progress') ?? allTasks[0];
+    const typeLabel = typeOf(task) || 'Event';
+
+    // Three generic study resources shown as cards below the scope panel.
+    // In a real app these would be attached to the task; here they illustrate
+    // the composition pattern (sl-card + image + title + body + action button).
+    const resources: Array<{
+      title: string;
+      description: string;
+      image: string;
+      cta: string;
+      ctaAriaLabel: string;
+    }> = [
+      {
+        title: 'Biology Made Simple: A Student\u2019s Guide to Life Science',
+        description: 'Flashcards to review key operations',
+        image: 'https://www.figma.com/api/mcp/asset/11e603ef-c6af-43b1-8b7f-a0d3c3fd3903',
+        cta: 'Read book',
+        ctaAriaLabel: 'Read the book: Biology Made Simple'
+      },
+      {
+        title: 'Video',
+        description: 'Watch the entire video to understand the topic better',
+        image: 'https://www.figma.com/api/mcp/asset/1c25de7e-3792-4670-a62d-0e0f2112e863',
+        cta: 'Watch video',
+        ctaAriaLabel: 'Watch the video'
+      },
+      {
+        title: 'Flashcards - review',
+        description: 'Review your knowledge with flashcards',
+        image: 'https://www.figma.com/api/mcp/asset/b7b3b79c-0a03-4266-b61c-91b476193765',
+        cta: 'Play',
+        ctaAriaLabel: 'Play the flashcard review'
+      }
+    ];
+
+    const markReady = (event: Event) => {
+      // Quick visual feedback before navigating back. In a real app this would
+      // update the task status via the store/API.
+      const btn = event.currentTarget as HTMLElement & { disabled?: boolean };
+      if (btn) btn.setAttribute('disabled', '');
+      task.status = 'done';
+      task.progress = 100;
+      backToWeeklyView();
+    };
+
+    return html`
+      <style>
+        .top-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          padding: 8px clamp(1rem, 4vw, 64px);
+          background: var(--sl-color-background-plain);
+          box-shadow:
+            0 1px 1px rgba(0, 0, 0, 0.09),
+            0 3px 2px rgba(0, 0, 0, 0.05);
+        }
+        .top-bar__logo {
+          display: flex;
+          align-items: center;
+          gap: 1.6px;
+          height: 30px;
+        }
+        .top-bar__logomark {
+          width: 22.849px;
+          height: 25.044px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .top-bar__logomark img {
+          width: 21.104px;
+          height: 16px;
+          transform: rotate(-75deg);
+          display: block;
+        }
+        .top-bar__wordmark {
+          width: 201.356px;
+          height: 22px;
+          display: block;
+          max-inline-size: 100%;
+          object-fit: contain;
+          object-position: left center;
+        }
+        .top-bar__profile {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--sl-color-foreground-plain);
+          font: var(--sl-text-body-md);
+        }
+        .task-detail {
+          display: grid;
+          gap: 1.25rem;
+          max-inline-size: 960px;
+          margin: 0 auto;
+          padding: clamp(1rem, 3vw, 2rem) clamp(0.75rem, 3vw, 1rem);
+          font: var(--sl-text-body-md);
+          color: var(--sl-color-foreground-plain);
+        }
+        .task-detail__back {
+          justify-self: start;
+        }
+        /* Title row: edit icon + title + status badge on one line (Figma 869:3343). */
+        .task-detail__title-row {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+        .task-detail__edit {
+          background: none;
+          border: 0;
+          padding: 4px;
+          margin: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--sl-color-foreground-bold);
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .task-detail__edit:hover {
+          background: var(--sl-color-background-plain-hover, rgba(0, 0, 0, 0.04));
+        }
+        .task-detail__edit:focus-visible {
+          outline: 2px solid var(--sl-color-border-accent, currentColor);
+          outline-offset: 2px;
+        }
+        .task-detail__title {
+          margin: 0;
+          font: var(--sl-text-new-heading-lg);
+          font-weight: var(--sl-text-new-typeset-fontWeight-semiBold, 600);
+          font-size: clamp(1.25rem, 3vw, 1.5rem);
+          line-height: 1.2;
+          color: var(--sl-color-foreground-bold);
+        }
+        .task-detail__subtitle {
+          margin: 0;
+          padding-inline-start: 2rem;
+          color: var(--sl-color-foreground-bold);
+          font-size: 14px;
+          line-height: 20px;
+        }
+        /* Scope panel heading + body (Figma section). */
+        .scope-panel::part(header) {
+          padding: 12px 16px;
+          min-block-size: 0;
+        }
+        .scope-panel::part(content) {
+          padding: 12px 16px 16px;
+        }
+        .scope-panel__heading {
+          font-size: 16px;
+          font-weight: var(--sl-text-new-typeset-fontWeight-semiBold, 600);
+          color: var(--sl-color-foreground-bold);
+        }
+        .scope-panel__intro {
+          margin: 0 0 0.25rem 0;
+          color: var(--sl-color-foreground-plain);
+        }
+        .scope-panel__list {
+          margin: 0;
+          padding-inline-start: 1.5rem;
+          color: var(--sl-color-foreground-plain);
+          line-height: 1.4;
+        }
+        .scope-panel__list li + li {
+          margin-block-start: 0.125rem;
+        }
+        /* Resource cards grid. Figma shows 3 side-by-side; wrap to 1 col on narrow. */
+        .task-detail__resources {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 1rem;
+        }
+        .task-detail__resources sl-card {
+          --sl-card-media-size: 200px;
+          --sl-card-horizontal-breakpoint: 9999px;
+          min-inline-size: 0;
+        }
+        .task-detail__resources sl-card img[slot='media'] {
+          inline-size: 100%;
+          block-size: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .task-detail__resources sl-card h2 {
+          margin: 0;
+          font-size: 16px;
+          font-weight: var(--sl-text-new-typeset-fontWeight-semiBold, 600);
+          line-height: 20px;
+          color: var(--sl-color-foreground-bold);
+        }
+        .task-detail__resources sl-card p[slot='body'] {
+          margin: 0;
+          color: var(--sl-color-foreground-plain);
+          font-size: 14px;
+          line-height: 20px;
+        }
+        /* Ready panel at the bottom. */
+        .ready-panel::part(header) {
+          display: none;
+        }
+        .ready-panel::part(content) {
+          padding: 16px 24px;
+        }
+        .ready-panel__row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+        .ready-panel__text {
+          margin: 0;
+          color: var(--sl-color-foreground-plain);
+        }
+        .ready-panel__cta {
+          --sl-button-color-foreground: var(--sl-color-foreground-success, #1c7c3e);
+          --sl-button-color-border: var(--sl-color-border-success, #1c7c3e);
+          color: var(--sl-color-foreground-success, #1c7c3e);
+        }
+        @media (max-inline-size: 520px) {
+          .top-bar__wordmark {
+            display: none;
+          }
+          .task-detail__subtitle {
+            padding-inline-start: 0;
+          }
+        }
+      </style>
+
+      <header class="top-bar" role="banner">
+        <div class="top-bar__logo" aria-label="Study Companion">
+          <span class="top-bar__logomark" aria-hidden="true">
+            <img src="/images/study-companion/logomark.svg" alt="" />
+          </span>
+          <img class="top-bar__wordmark" src="/images/study-companion/wordmark.svg" alt="Study Companion" />
+        </div>
+        <div class="top-bar__profile">
+          <sl-avatar display-name="Ada Kowalska" size="md" picture-url="/images/avatar-3.jpg">
+            <sl-badge
+              slot="badge"
+              color="red"
+              emphasis="bold"
+              size="sm"
+              role="status"
+              aria-label="3 unread notifications"
+            ></sl-badge>
+          </sl-avatar>
+        </div>
+      </header>
+
+      <main class="task-detail">
+        <sl-breadcrumbs aria-label="Breadcrumb">
+          <a
+            href="javascript:void(0)"
+            @click=${(event: Event) => {
+              event.preventDefault();
+              backToWeeklyView();
+            }}
+            >Home</a
+          >
+        </sl-breadcrumbs>
+
+        <div class="task-detail__title-row">
+          <button type="button" class="task-detail__edit" aria-label=${`Edit ${topicOf(task)}`}>
+            <sl-icon name="far-pen-to-square"></sl-icon>
+          </button>
+          <h1 class="task-detail__title">${topicOf(task)}</h1>
+          ${statusBadge(task.status)}
+        </div>
+        <p class="task-detail__subtitle">${typeLabel}${spice(task.priority)}</p>
+
+        <sl-panel class="scope-panel" divider>
+          <span slot="heading" class="scope-panel__heading">Scope of the ${typeLabel.toLowerCase()}</span>
+          <p class="scope-panel__intro">Check out these three engaging topics for upper primary students:</p>
+          <ol class="scope-panel__list">
+            <li>Read 3rd and 4th chapter of the book “Biology Made Simple: A Student’s Guide to Life Science”</li>
+            <li>Watch video to understand topic better</li>
+            <li>Flashcards allow you to check your knowledge</li>
+          </ol>
+        </sl-panel>
+
+        <div class="task-detail__resources">
+          ${resources.map(
+            r => html`
+              <sl-card orientation="vertical">
+                <img slot="media" src=${r.image} alt="" />
+                <h2>${r.title}</h2>
+                <p slot="body">${r.description}</p>
+                <sl-button-bar slot="actions">
+                  <sl-button variant="primary" aria-label=${r.ctaAriaLabel}>${r.cta}</sl-button>
+                </sl-button-bar>
+              </sl-card>
+            `
+          )}
+        </div>
+
+        <sl-panel class="ready-panel">
+          <div class="ready-panel__row">
+            <p class="ready-panel__text">Once you’re ready, select “I’m ready” to update the element’s status.</p>
+            <sl-button
+              class="ready-panel__cta"
+              fill="outline"
+              shape="pill"
+              aria-label=${`Mark ${topicOf(task)} as ready`}
+              @click=${markReady}
+            >
+              I’m ready
+            </sl-button>
+          </div>
+        </sl-panel>
       </main>
     `;
   }
