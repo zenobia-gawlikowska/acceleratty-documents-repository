@@ -63,7 +63,6 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 - Completing a task changes its status and refreshes the list/view immediately.
 
 [ ] FR-05: Integration of educational materials (Sanoma products only)
-- Allow linking/attaching educational materials from Sanoma products (e.g., links, documents, references) to events/tasks.
 - Materials are accessible from the event/task detail view.
 - Materials open in an accessible manner (proper labels, keyboard operability).
 - External (non-Sanoma) materials are not supported in this phase.
