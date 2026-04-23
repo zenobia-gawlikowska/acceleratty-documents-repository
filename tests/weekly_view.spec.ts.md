@@ -79,4 +79,15 @@ test.describe('Study Companion Weekly View', () => {
     await expect(preview.locator('sl-panel[data-type="oral-exam"]').first()).toBeHidden();
     await expect(preview.locator('sl-panel[data-type="written-assignment"]').first()).toBeHidden();
   });
+
+  test('can change to dark mode', async ({ page }) => {
+    await page.getByText('Quadratic equations').waitFor({ state: 'visible', timeout: 5000 });
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    // Navigate with dark mode global
+    await page.goto(
+      'http://localhost:6006/iframe.html?id=examples-study-companion--weekly-view&viewMode=story&globals=mode:dark',
+      { waitUntil: 'networkidle' }
+    );
+    await expect(page.locator('body')).not.toHaveCSS('background-color', 'rgb(22, 22, 22)');
+  });
 });
