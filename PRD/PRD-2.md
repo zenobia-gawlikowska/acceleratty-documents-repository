@@ -32,6 +32,8 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 |    Student     |      filter and sort events by subject, difficulty, date, event type, and status       |  I can quickly narrow down to what matters         |
 |    Student     |      search events by text (subject and description fragment)       |  I can find specific items without scrolling         |
 |    Student     |      mark a task as done and see the list refresh       |  my current workload is always up to date         |
+|    Student     |      access educational materials from Sanoma products linked to events/tasks       |  I can study the relevant content without searching elsewhere         |
+|    Student     |      have my events/tasks automatically imported from my e-gradebook       |  I don’t have to re-enter assignments manually         |
 
 ## 4. Requirements
 
@@ -60,6 +62,19 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 [ ] FR-04: Completing a task updates the view
 - Completing a task changes its status and refreshes the list/view immediately.
 
+[ ] FR-05: Integration of educational materials (Sanoma products only)
+- Allow linking/attaching educational materials from Sanoma products (e.g., links, documents, references) to events/tasks.
+- Materials are accessible from the event/task detail view.
+- Materials open in an accessible manner (proper labels, keyboard operability).
+- External (non-Sanoma) materials are not supported in this phase.
+
+[ ] FR-06: Integration with e-gradebooks
+- Automatically import events/tasks (e.g., exams, tests, assignments, deadlines) from supported e-gradebook systems.
+- Imported items include at minimum: subject, event type, date/deadline, and description (when available).
+- Imported events are kept in sync (additions, updates, and removals reflected in the app).
+- Handle authentication/authorization with the e-gradebook provider securely.
+- Provide clear error handling and user feedback when sync fails or credentials expire.
+
 ### Non-Functional Requirements
 [ ] NFR-01: Accessibility (WCAG 2.2 AA)
 - Full keyboard support (no focus traps), visible focus and compliant focus appearance.
@@ -73,6 +88,6 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 
 ## 5. Out of Scope
 - Integrations with e-gradebooks / LMS (automatic assignment import) — later phase.
-- Integration of educational materials — later phase.
+- Possibility of adding external (non-Sanoma) educational materials — later phase.
 - Progress bar (visual indicator of task/study completion progress) — later phase.
 - Manual event creation by students (adding custom events/tasks) — later phase.
