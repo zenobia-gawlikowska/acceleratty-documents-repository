@@ -15,7 +15,8 @@ User story chosen: *"As a student, I want to see all tasks for the week in a cle
 ## Composition of approved components:
 
 
-![screenshot-20260422195658579](/api/file/raw?path=screenshot-20260422195658579.png)
+![screenshot-20260423093804778](/api/file/raw?path=Development%2Fscreenshot-20260423093804778.png)
+
 
 ## WCAG 2.2 AA touchpoints covered
 
