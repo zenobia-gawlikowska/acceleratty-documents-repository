@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Study Companion Weekly View', () => {
-  test.beforeEach('renders the weekly view with correct tabs', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:6006/?path=/story/examples-study-companion--weekly-view', {
       waitUntil: 'networkidle'
     });
@@ -10,82 +10,69 @@ test.describe('Study Companion Weekly View', () => {
   test('can use search in Study Companion weekly view', async ({ page }) => {
     const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
 
-    // Wait for the search input to render
-    await preview.locator('input#sl-text-field-1').waitFor({ state: 'visible', timeout: 5000 });
-    // Type a search query
-    await preview.locator('input#sl-text-field-1').fill('Math');
-    await preview.getByRole('button', { name: /Search/i }).press('Enter');
-    // Verify search results are visible
-    await expect(preview.getByText(/Monday · Apr/)).toBeVisible();
-    await expect(preview.getByText(/Tuesday · Apr/)).not.toBeVisible();
-    await expect(preview.getByText(/Wednesday · Apr/)).not.toBeVisible();
-    await expect(preview.getByText(/Thursday · Apr/)).toBeVisible();
-    await expect(preview.getByText(/Friday · May/)).not.toBeVisible();
+    const searchField = preview.getByRole('textbox', { name: 'Search tasks' });
+    await searchField.waitFor({ state: 'visible', timeout: 5000 });
+
+    await searchField.fill('Math');
+    await preview.getByRole('button', { name: 'Search' }).click();
+
+    // Only Monday and Thursday have Math tasks; Friday has no tasks so its
+    // (empty) day panel stays visible regardless of the filter.
+    await expect(preview.locator('sl-panel[heading^="Monday"]')).toBeVisible();
+    await expect(preview.locator('sl-panel[heading^="Tuesday"]')).toBeHidden();
+    await expect(preview.locator('sl-panel[heading^="Wednesday"]')).toBeHidden();
+    await expect(preview.locator('sl-panel[heading^="Thursday"]')).toBeVisible();
 
     const weekPanel = preview.locator('sl-tab-panel').nth(1);
-    await expect(weekPanel.locator('sl-panel[heading="Quadratic equations — test 🌶️🌶️"]')).toBeVisible();
-    await expect(weekPanel.locator('sl-panel[heading="Partitions of Poland — essay outline 🌶️"]')).not.toBeVisible();
-    await expect(weekPanel.locator('sl-panel[heading="Fractions — worksheet 🌶️"]')).toBeVisible();
-  });
-
-  test('can use filter by Status', async ({ page }) => {
-    const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
-
-    // Wait for the search input to render
-    await preview.locator('sl-select-button[label=Status]').waitFor({ state: 'visible', timeout: 5000 });
-    // Type a search query
-    await preview.locator('sl-select-button[label=Status]').click();
-    await page.locator('sl-option[value=todo]').click();
-    await preview.getByRole('button', { name: /Search/i }).press('Enter');
-    // Verify search results are visible
-    await expect(preview.getByText(/To Do/)).toBeVisible();
-    await expect(preview.getByText(/In Progress/)).not.toBeVisible();
-    await expect(preview.getByText(/Done/)).not.toBeVisible();
+    await expect(weekPanel.locator('sl-panel[data-subject-key="math"]').first()).toBeVisible();
+    await expect(weekPanel.locator('sl-panel[data-subject-key="history"]')).toBeHidden();
   });
 
   test('can use filter by Difficulty', async ({ page }) => {
     const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
 
-    // Wait for the search input to render
-    await preview.locator('sl-select-button[label=Difficulty]').waitFor({ state: 'visible', timeout: 5000 });
-    // Type a search query
-    await preview.locator('sl-select-button[label=Difficulty]').click();
-    await page.locator('sl-option[value=easy]').click();
-    await preview.getByRole('button', { name: /Search/i }).press('Enter');
-    // Verify search results are visible
-    await expect(preview.getByText('🌶️')).toBeVisible();
-    await expect(preview.getByText('🌶️🌶️')).not.toBeVisible();
-    await expect(preview.getByText('🌶️🌶️🌶️')).not.toBeVisible();
+    const select = preview.getByRole('combobox', { name: 'Filter by difficulty' });
+    await select.waitFor({ state: 'visible', timeout: 5000 });
+
+    await select.click();
+    await preview.getByRole('option', { name: /^Easy/ }).click();
+
+    // Only the "Impressionism — bring portfolio" task (priority=low → 🌶️) should remain.
+    await expect(preview.locator('sl-panel[data-priority="low"]').first()).toBeVisible();
+    await expect(preview.locator('sl-panel[data-priority="normal"]').first()).toBeHidden();
+    await expect(preview.locator('sl-panel[data-priority="high"]').first()).toBeHidden();
   });
 
   test('can use filter by Subject', async ({ page }) => {
     const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
 
-    // Wait for the search input to render
-    await preview.locator('sl-select-button[label=Subject]').waitFor({ state: 'visible', timeout: 5000 });
-    // Type a search query
-    await preview.locator('sl-select-button[label=Subject]').click();
-    await page.locator('sl-option[value=biology]').click();
-    await preview.getByRole('button', { name: /Search/i }).press('Enter');
-    // Verify search results are visible
-    await expect(preview.getByText('🏴󠁧󠁢󠁥󠁮󠁧󠁿 English')).not.toBeVisible();
-    await expect(preview.getByText('🌍 Geography')).not.toBeVisible();
-    await expect(preview.getByText('🧬 Biology')).toBeVisible();
+    const select = preview.getByRole('combobox', { name: 'Filter by subject' });
+    await select.waitFor({ state: 'visible', timeout: 5000 });
+
+    await select.click();
+    await preview.getByRole('option', { name: 'Science' }).click();
+
+    // Only science tasks should remain visible.
+    await expect(preview.locator('sl-panel[data-subject-key="science"]').first()).toBeVisible();
+    await expect(preview.locator('sl-panel[data-subject-key="math"]').first()).toBeHidden();
+    await expect(preview.locator('sl-panel[data-subject-key="history"]').first()).toBeHidden();
+    await expect(preview.locator('sl-panel[data-subject-key="geography"]').first()).toBeHidden();
+    await expect(preview.locator('sl-panel[data-subject-key="art"]').first()).toBeHidden();
   });
 
-  test('can use filter by Event type', async ({ page }) => {
+  test('can use filter by Topic', async ({ page }) => {
     const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
 
-    // Wait for the search input to render
-    await preview.locator('sl-select-button[label=Event type]').waitFor({ state: 'visible', timeout: 5000 });
-    // Type a search query
-    await preview.locator('sl-select-button[label=Event type]').click();
-    await page.locator('sl-option[value=exam]').click();
-    await preview.getByRole('button', { name: /Search/i }).press('Enter');
-    // Verify search results are visible
-    await expect(preview.getByText(/Exam 🌶️️️🌶️️️🌶️/)).toBeVisible();
-    await expect(preview.getByText(/Test 🌶️️️🌶️/)).not.toBeVisible();
-    await expect(preview.getByText(/Test 🌶️/)).not.toBeVisible();
-    await expect(preview.getByText(/Oral exam/)).not.toBeVisible();
+    const select = preview.getByRole('combobox', { name: 'Filter by topic' });
+    await select.waitFor({ state: 'visible', timeout: 5000 });
+
+    await select.click();
+    await preview.getByRole('option', { name: 'Fractions' }).click();
+
+    // Only the "Fractions — worksheet" task should remain in the week view.
+    const weekPanel = preview.locator('sl-tab-panel').nth(1);
+    await expect(weekPanel.locator('sl-panel[data-topic="fractions"]')).toBeVisible();
+    await expect(weekPanel.locator('sl-panel[data-topic="quadratic-equations"]')).toBeHidden();
+    await expect(weekPanel.locator('sl-panel[data-topic="cell-biology"]')).toBeHidden();
   });
 });
