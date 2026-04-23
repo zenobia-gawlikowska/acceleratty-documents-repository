@@ -74,4 +74,30 @@ test.describe('A11y: Study Companion weekly view tabs', () => {
     results = await runAxe();
     expect(results.violations.length, 'Accessibility violations found, see details above').toEqual(0);
   });
+
+  test('should have correct tab order', async ({ page }) => {
+    const activeElements = [
+      'Search',
+      'Search',
+      'Subject',
+      'Event type',
+      'Status',
+      'Difficulty',
+      'From date',
+      'Select from date',
+      'To date',
+      'Select to date',
+      'Continue Title of the element',
+      'Start Title of the element',
+      'Start Title of the element'
+    ] as const;
+
+    await page.getByRole('button', { name: 'Collapse navigation' }).click();
+
+    for (const activeElement of activeElements) {
+      await page.keyboard.press('Tab');
+      const focusedOn = await getFocusedElement(page);
+      expect(focusedOn).toBe(activeElement);
+    }
+  });
 });
