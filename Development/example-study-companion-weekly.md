@@ -13,6 +13,8 @@ User story chosen: *"As a student, I want to see all tasks for the week in a cle
 
 ## Composition of approved components:
 
+![screenshot-20260422195658579](/api/file/raw?path=screenshot-20260422195658579.png)
+
 ## WCAG 2.2 AA touchpoints covered
 
 All icon-only controls (sl-toggle-button, add-task buttons) carry aria-label + sl-tooltip linked via aria-describedby.
