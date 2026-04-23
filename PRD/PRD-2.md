@@ -29,7 +29,7 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 |    Student     |      see an empty view when all tasks are completed       |  I know I’m fully up to date          |
 |    Student     |      browse tasks in a short perspective (today–tomorrow)       |  I can focus on what’s next right away         |
 |    Student     |      browse tasks in a long perspective (next week)       |  I can anticipate workload and deadlines         |
-|    Student     |      filter and sort events by subject, difficulty, date, and event type (exam/test, quiz, homework)       |  I can quickly narrow down to what matters         |
+|    Student     |      filter and sort events by subject, difficulty, date, event type, and status       |  I can quickly narrow down to what matters         |
 |    Student     |      search events by text (subject and description fragment)       |  I can find specific items without scrolling         |
 |    Student     |      mark a task as done and see the list refresh       |  my current workload is always up to date         |
 
@@ -49,7 +49,7 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
   - subject
   - difficulty
   - date
-  - event type (exam/test, quiz, homework)
+  - event type (exam, test, oral exam, written assignment)
   - status (to do, in progress, after deadline, done)
 
 [ ] FR-03: Search (text)
