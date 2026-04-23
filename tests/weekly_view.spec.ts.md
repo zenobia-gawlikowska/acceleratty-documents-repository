@@ -27,4 +27,20 @@ test.describe('Study Companion Weekly View', () => {
     await expect(weekPanel.locator('sl-panel[heading="Partitions of Poland — essay outline 🌶️"]')).not.toBeVisible();
     await expect(weekPanel.locator('sl-panel[heading="Fractions — worksheet 🌶️"]')).toBeVisible();
   });
+
+  test('can use filter by Status', async ({ page }) => {
+    const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
+
+    // Wait for the search input to render
+    await preview.locator('sl-select-button[label=Status]').waitFor({ state: 'visible', timeout: 5000 });
+    // Type a search query
+    await preview.locator('sl-select-button[label=Status]').click();
+    await page.locator('sl-option[value=english]').click();
+    await preview.getByRole('button', { name: /Search/i }).press('Enter');
+    // Verify search results are visible
+    await expect(preview.getByText(/🏴󠁧󠁢󠁥󠁮󠁧󠁿 English\s*Description for the student, what they need to do/i)).toBeVisible();
+    await expect(
+      preview.getByText(/🌍 Geography\s*Description for the student, what they need to do/i)
+    ).not.toBeVisible();
+  });
 });
