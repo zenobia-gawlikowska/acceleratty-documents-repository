@@ -483,7 +483,7 @@ export const WeeklyView: Story = {
           block-size: 20px;
           display: inline-flex;
           align-items: center;
-          padding-block-start: 6px;
+          padding-block-start: 8px;
         }
         /* Stacked title + event-type subtitle in the task panel header
            (Figma: Multitenant materials, node 869:10300). */
@@ -539,12 +539,19 @@ export const WeeklyView: Story = {
         </div>
         <div class="top-bar__profile">
           <sl-avatar display-name="Ada Kowalska" size="md" picture-url="/images/avatar-3.jpg">
-            <sl-badge slot="badge" color="red" emphasis="bold" size="sm" aria-label="3 unread notifications"></sl-badge>
+            <sl-badge
+              slot="badge"
+              color="red"
+              emphasis="bold"
+              size="sm"
+              role="status"
+              aria-label="3 unread notifications"
+            ></sl-badge>
           </sl-avatar>
         </div>
       </header>
 
-      <div class="study-dashboard">
+      <main class="study-dashboard">
         <header class="dashboard-header">
           <sl-avatar display-name="Ada Kowalska" size="md"></sl-avatar>
           <h1>Hi, Ada — this is your week</h1>
@@ -665,7 +672,7 @@ export const WeeklyView: Story = {
             </p>
           </sl-tab-panel>
         </sl-tab-group>
-      </div>
+      </main>
     `;
   }
 };
