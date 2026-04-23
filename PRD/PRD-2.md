@@ -50,6 +50,7 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
   - difficulty
   - date
   - event type (exam/test, quiz, homework)
+  - status (to do, in progress, after deadline, done)
 
 [ ] FR-03: Search (text)
 - Enable text search for events by:
@@ -72,4 +73,5 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 
 ## 5. Out of Scope
 - Integrations with e-gradebooks / LMS (automatic assignment import) — later phase.
-- Integration of educational materials
+- Integration of educational materials — later phase.
+- Progress bar (visual indicator of task/study completion progress) — later phase.
