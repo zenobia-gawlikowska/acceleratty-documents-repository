@@ -47,3 +47,10 @@ After deadline - status added automatically when element reached deadline and st
 
 
 Students can mark elements as done in detailed view of element, available after clicking "Start" or Continue" on panel 
+
+level of difficulty for an element is marked via chilli pepper
+- 1 chilli pepper - easy 
+- 2 chilli pepper - medium 
+- 3 chilli pepper - hard
+
+System based on what is actually used by teachers in schools, when creating assignment with different level of difficulty 
