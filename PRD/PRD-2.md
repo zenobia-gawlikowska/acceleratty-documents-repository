@@ -109,12 +109,7 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 - Icons, illustrations, and typography follow SLDS asset libraries and branding guidelines.
 - Keep the SLDS dependency up to date (within the supported version range) to benefit from accessibility and visual consistency improvements.
 
-## 5. Out of Scope
-- Possibility of adding external (non-Sanoma) educational materials — later phase.
-- Progress bar (visual indicator of task/study completion progress) — later phase.
-- Manual event creation by students (adding custom events/tasks) — later phase.
-
-## 6. Future Requirements (later phases)
+## 5. Future Requirements (later phases)
 
 [ ] FUT-01: Self-marking as "Prepared"
 - Allow students to manually mark themselves as prepared for an upcoming event (separate from "Done").
