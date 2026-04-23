@@ -75,3 +75,4 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 - Integrations with e-gradebooks / LMS (automatic assignment import) — later phase.
 - Integration of educational materials — later phase.
 - Progress bar (visual indicator of task/study completion progress) — later phase.
+- Manual event creation by students (adding custom events/tasks) — later phase.
