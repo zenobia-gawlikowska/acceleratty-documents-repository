@@ -10,6 +10,13 @@ import {
   faPalette,
   faPlus
 } from '@fortawesome/pro-regular-svg-icons';
+import {
+  faBook as fasBook,
+  faCalculator as fasCalculator,
+  faFlask as fasFlask,
+  faGlobe as fasGlobe,
+  faPalette as fasPalette
+} from '@fortawesome/pro-solid-svg-icons';
 import '@sl-design-system/avatar/register.js';
 import '@sl-design-system/badge/register.js';
 import '@sl-design-system/button/register.js';
@@ -39,7 +46,12 @@ Icon.register(
   faFlask,
   faGlobe,
   faPalette,
-  faPlus
+  faPlus,
+  fasBook,
+  fasCalculator,
+  fasFlask,
+  fasGlobe,
+  fasPalette
 );
 
 type Story = StoryObj;
@@ -48,6 +60,7 @@ type Subject = {
   key: string;
   label: string;
   iconName: string;
+  iconNamePressed: string;
   color: 'blue' | 'purple' | 'green' | 'orange' | 'red';
 };
 
@@ -64,11 +77,11 @@ type Task = {
 };
 
 const subjects: Subject[] = [
-  { key: 'math', label: 'Math', iconName: 'far-calculator', color: 'blue' },
-  { key: 'history', label: 'History', iconName: 'far-book', color: 'orange' },
-  { key: 'science', label: 'Science', iconName: 'far-flask', color: 'green' },
-  { key: 'geography', label: 'Geography', iconName: 'far-globe', color: 'purple' },
-  { key: 'art', label: 'Art', iconName: 'far-palette', color: 'red' }
+  { key: 'math', label: 'Math', iconName: 'far-calculator', iconNamePressed: 'fas-calculator', color: 'blue' },
+  { key: 'history', label: 'History', iconName: 'far-book', iconNamePressed: 'fas-book', color: 'orange' },
+  { key: 'science', label: 'Science', iconName: 'far-flask', iconNamePressed: 'fas-flask', color: 'green' },
+  { key: 'geography', label: 'Geography', iconName: 'far-globe', iconNamePressed: 'fas-globe', color: 'purple' },
+  { key: 'art', label: 'Art', iconName: 'far-palette', iconNamePressed: 'fas-palette', color: 'red' }
 ];
 
 const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
@@ -181,12 +194,12 @@ const statusBadge = (status: Task['status']) => {
   return html`<sl-badge color="orange" emphasis="subtle" size="lg">To do</sl-badge>`;
 };
 
-// Spiciness = priority. High-priority tasks get peppers appended to their title
-// (matching the Figma frame's "Test 🌶️🌶️" convention).
+// Spiciness = priority. Peppers match the difficulty select labels:
+// low = 🌶️ (easy), normal = 🌶️🌶️ (medium), high = 🌶️🌶️🌶️ (hard).
 const spice = (priority: Task['priority']) => {
-  if (priority === 'high') return ' 🌶️🌶️';
-  if (priority === 'normal') return ' 🌶️';
-  return '';
+  if (priority === 'high') return ' 🌶️🌶️🌶️';
+  if (priority === 'normal') return ' 🌶️🌶️';
+  return ' 🌶️';
 };
 
 // Design decision: no artwork/imagery represents an event (test/quiz/essay),
@@ -194,8 +207,30 @@ const spice = (priority: Task['priority']) => {
 // Layout mirrors the Figma frame `sl-panel-default` (Multitenant materials, 821:2537):
 // icon prefix, title heading, subtle status badge suffix, divider, body with
 // subject line + description, and a primary pill `Start` action in a button-bar.
+// A task's "topic" is the part of the title before " — " (e.g. "Quadratic equations"
+// from "Quadratic equations — test"). Used to populate the topic filter select.
+const topicOf = (task: Task) => task.title.split(' — ')[0].trim();
+const topicSlug = (topic: string) =>
+  topic
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/g, '-')
+    .replaceAll(/^-|-$/g, '');
+
+const allTopics: Array<{ slug: string; label: string }> = Array.from(
+  new Map(week.flatMap(d => d.tasks.map(t => [topicSlug(topicOf(t)), topicOf(t)] as const))).entries()
+)
+  .map(([slug, label]) => ({ slug, label }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
 const taskPanel = (task: Task) => html`
-  <sl-panel heading=${`${task.title}${spice(task.priority)}`} data-subject=${task.subject.label} divider>
+  <sl-panel
+    heading=${`${task.title}${spice(task.priority)}`}
+    data-subject=${task.subject.label}
+    data-subject-key=${task.subject.key}
+    data-priority=${task.priority}
+    data-topic=${topicSlug(topicOf(task))}
+    divider
+  >
     <sl-icon slot="prefix" name=${task.subject.iconName}></sl-icon>
     <span slot="aside" style="display: flex; justify-content: flex-end;">${statusBadge(task.status)}</span>
 
@@ -260,35 +295,66 @@ export default {
  */
 export const WeeklyView: Story = {
   render: () => {
-    const runSearch = (event: Event) => {
-      const root = (event.target as HTMLElement).closest('.study-dashboard');
-      if (!root) return;
+    const difficultyToPriority: Record<string, Task['priority']> = {
+      easy: 'low',
+      medium: 'normal',
+      hard: 'high'
+    };
 
-      const searchField = root.querySelector<HTMLInputElement>('.dashboard-toolbar sl-search-field');
+    const applyFiltersToRoot = (root: Element) => {
+      const toolbar = root.querySelector('.dashboard-toolbar');
+      const subjectFilters = root.querySelector('.subject-filters');
+      if (!toolbar || !subjectFilters) return;
+
+      const searchField = toolbar.querySelector<HTMLInputElement>('sl-search-field');
       const query = (searchField?.value ?? '').toString().trim().toLowerCase();
-      const weekTabPanel = root.querySelectorAll('sl-tab-panel')[1];
-      if (!weekTabPanel) return;
 
-      const dayPanels = weekTabPanel.querySelectorAll<HTMLElement>(':scope > div > sl-panel');
-      dayPanels.forEach(day => {
-        const taskPanels = day.querySelectorAll<HTMLElement>('sl-panel');
+      const selects = toolbar.querySelectorAll<HTMLElement & { value?: string }>('sl-select');
+      const subjectValue = selects[0]?.value ?? 'all';
+      const difficultyValue = selects[1]?.value ?? 'all';
+      const topicValue = selects[2]?.value ?? 'all';
 
-        if (!query) {
-          day.style.display = '';
-          taskPanels.forEach(t => (t.style.display = ''));
-          return;
-        }
-
-        let anyVisible = false;
-        taskPanels.forEach(t => {
-          const heading = (t.getAttribute('heading') ?? '').toLowerCase();
-          const subject = (t.getAttribute('data-subject') ?? '').toLowerCase();
-          const match = heading.includes(query) || subject.includes(query);
-          t.style.display = match ? '' : 'none';
-          if (match) anyVisible = true;
+      const pressedSubjectKeys = new Set<string>();
+      subjectFilters
+        .querySelectorAll<HTMLElement & { pressed?: boolean }>('sl-toggle-button[data-subject-key]')
+        .forEach(tb => {
+          if (tb.pressed) pressedSubjectKeys.add(tb.dataset.subjectKey ?? '');
         });
-        day.style.display = anyVisible ? '' : 'none';
+
+      const taskMatches = (t: HTMLElement) => {
+        const heading = (t.getAttribute('heading') ?? '').toLowerCase();
+        const subjectLabel = (t.dataset.subject ?? '').toLowerCase();
+        const subjectKey = t.dataset.subjectKey ?? '';
+        const priority = t.dataset.priority ?? '';
+        const topic = t.dataset.topic ?? '';
+
+        if (query && !heading.includes(query) && !subjectLabel.includes(query)) return false;
+        if (subjectValue !== 'all' && subjectKey !== subjectValue) return false;
+        if (difficultyValue !== 'all' && priority !== difficultyToPriority[difficultyValue]) return false;
+        if (topicValue !== 'all' && topic !== topicValue) return false;
+        if (pressedSubjectKeys.size > 0 && !pressedSubjectKeys.has(subjectKey)) return false;
+
+        return true;
+      };
+
+      const taskPanels = root.querySelectorAll<HTMLElement>('sl-tab-panel sl-panel[data-subject-key]');
+      const dayVisibility = new Map<HTMLElement, boolean>();
+
+      taskPanels.forEach(t => {
+        const ok = taskMatches(t);
+        t.style.display = ok ? '' : 'none';
+        const day = t.parentElement?.closest<HTMLElement>('sl-panel:not([data-subject-key])');
+        if (day) dayVisibility.set(day, (dayVisibility.get(day) ?? false) || ok);
       });
+
+      dayVisibility.forEach((visible, day) => {
+        day.style.display = visible ? '' : 'none';
+      });
+    };
+
+    const applyFilters = (event: Event) => {
+      const root = (event.target as HTMLElement).closest('.study-dashboard');
+      if (root) applyFiltersToRoot(root);
     };
 
     return html`
@@ -438,13 +504,14 @@ export const WeeklyView: Story = {
           <sl-search-field
             aria-label="Search tasks"
             placeholder="Search tasks, subjects, materials…"
+            @sl-change=${applyFilters}
             @keydown=${(e: KeyboardEvent) => {
-              if (e.key === 'Enter') runSearch(e);
+              if (e.key === 'Enter') applyFilters(e);
             }}
           ></sl-search-field>
-          <sl-button aria-label="Search" variant="primary" @click=${runSearch}>Search</sl-button>
+          <sl-button aria-label="Search" variant="primary" @click=${applyFilters}>Search</sl-button>
 
-          <sl-select aria-label="Filter by subject" placeholder="All subjects">
+          <sl-select aria-label="Filter by subject" placeholder="All subjects" @sl-change=${applyFilters}>
             <sl-option value="all">All subjects</sl-option>
             ${subjects.map(
               s => html`
@@ -456,6 +523,18 @@ export const WeeklyView: Story = {
             )}
           </sl-select>
 
+          <sl-select aria-label="Filter by difficulty" value="all" @sl-change=${applyFilters}>
+            <sl-option value="all">All</sl-option>
+            <sl-option value="easy">Easy 🌶️</sl-option>
+            <sl-option value="medium">Medium 🌶️🌶️</sl-option>
+            <sl-option value="hard">Hard 🌶️🌶️🌶️</sl-option>
+          </sl-select>
+
+          <sl-select aria-label="Filter by topic" value="all" @sl-change=${applyFilters}>
+            <sl-option value="all">All topics</sl-option>
+            ${allTopics.map(t => html`<sl-option value=${t.slug}>${t.label}</sl-option>`)}
+          </sl-select>
+
           <sl-date-field aria-label="Jump to date"></sl-date-field>
         </div>
 
@@ -463,9 +542,16 @@ export const WeeklyView: Story = {
           ${subjects.map(
             s => html`
               <sl-tooltip id=${`tt-${s.key}`} position="top">Show only ${s.label}</sl-tooltip>
-              <sl-toggle-button fill="outline" shape="pill" aria-label=${s.label} aria-describedby=${`tt-${s.key}`}>
+              <sl-toggle-button
+                fill="outline"
+                shape="pill"
+                data-subject-key=${s.key}
+                aria-label=${s.label}
+                aria-describedby=${`tt-${s.key}`}
+                @sl-toggle=${applyFilters}
+              >
                 <sl-icon name=${s.iconName} slot="default"></sl-icon>
-                <sl-icon name="far-check" slot="pressed"></sl-icon>
+                <sl-icon name=${s.iconNamePressed} slot="pressed"></sl-icon>
               </sl-toggle-button>
             `
           )}
