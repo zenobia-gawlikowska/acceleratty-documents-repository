@@ -361,7 +361,8 @@ export const WeeklyView: Story = {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 8px 64px;
+          gap: 1rem;
+          padding: 8px clamp(1rem, 4vw, 64px);
           background: #fff;
           box-shadow:
             0 1px 1px rgba(0, 0, 0, 0.09),
@@ -390,6 +391,9 @@ export const WeeklyView: Story = {
           width: 201.356px;
           height: 22px;
           display: block;
+          max-inline-size: 100%;
+          object-fit: contain;
+          object-position: left center;
         }
         .top-bar__profile {
           display: flex;
@@ -403,7 +407,7 @@ export const WeeklyView: Story = {
           gap: 1.5rem;
           max-inline-size: 720px;
           margin: 0 auto;
-          padding: 2rem 1rem;
+          padding: clamp(1rem, 3vw, 2rem) clamp(0.75rem, 3vw, 1rem);
           font: var(--sl-text-body-md);
         }
         .dashboard-header {
@@ -416,6 +420,8 @@ export const WeeklyView: Story = {
           /* Figma 'Heading/xl' (node 834:31854): 32px / 40px, semiBold. */
           font: var(--sl-text-new-heading-xl);
           font-weight: var(--sl-text-new-typeset-fontWeight-semiBold);
+          font-size: clamp(1.5rem, 4.5vw, 2rem);
+          line-height: 1.25;
           color: var(--sl-color-foreground-plain);
           text-align: center;
         }
@@ -451,6 +457,9 @@ export const WeeklyView: Story = {
           display: flex;
           align-items: baseline;
           justify-content: space-between;
+          flex-wrap: wrap;
+          column-gap: 0.75rem;
+          row-gap: 0.25rem;
           margin: var(--sl-size-250) 0;
           font-weight: var(--sl-text-new-typeset-fontWeight-semiBold, 600);
           color: var(--sl-color-foreground-bold);
@@ -514,11 +523,18 @@ export const WeeklyView: Story = {
           justify-content: flex-end;
           align-self: start;
           padding-block-start: 14px;
-          padding-inline-end: 16px;
+        }
+        .task-aside sl-badge {
+          white-space: nowrap;
+          inline-size: fit-content;
+          flex: 0 0 auto;
         }
         /* Figma body padding: 16px 24px 24px 24px (spacing below the divider). */
         .task-panel::part(content) {
-          padding: 16px 24px 24px 24px;
+          padding: 16px 16px 24px 24px;
+        }
+        .day-section__date {
+          color: var(--sl-color-foreground-bold);
         }
         @media (max-inline-size: 720px) {
           .toolbar-selects {
@@ -526,6 +542,39 @@ export const WeeklyView: Story = {
           }
           .toolbar-dates {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          .toolbar-dates > :last-child {
+            display: none;
+          }
+          .task-panel::part(header) {
+            padding: 12px 12px 12px 16px;
+          }
+          .task-panel::part(content) {
+            padding: 12px 16px 16px 16px;
+          }
+          .task-aside {
+            padding-block-start: 12px;
+            padding-inline-end: 12px;
+          }
+        }
+        @media (max-inline-size: 520px) {
+          .top-bar__wordmark {
+            display: none;
+          }
+          .toolbar-search {
+            grid-template-columns: 1fr;
+          }
+          .toolbar-selects {
+            grid-template-columns: 1fr;
+          }
+          .toolbar-dates {
+            grid-template-columns: 1fr;
+          }
+          .task-heading__title {
+            font-size: 15px;
+          }
+          .task-heading__subtitle {
+            font-size: 13px;
           }
         }
       </style>
