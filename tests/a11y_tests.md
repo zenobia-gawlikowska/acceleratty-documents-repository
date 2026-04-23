@@ -1,28 +1,48 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { type Page, expect, test } from '@playwright/test';
+import type { AxeResults } from 'axe-core';
+
+const STORY_URL = 'http://localhost:6006/iframe.html?id=examples-study-companion--weekly-view&viewMode=story';
 
 let axe: AxeBuilder;
 let results: AxeResults;
-
-function getPreviewFrame(page) {
-  const frames = page.frames();
-  return frames.find(f => f.url().includes('iframe.html') || f.url().includes('storybook-preview'));
-}
 
 function createNumberedList<T>(items: T[]): string {
   return items.map((item, index) => `${index + 1}. ${item}`).join('\n');
 }
 
+async function selectTab(page: Page, name: string): Promise<void> {
+  await page.click(`sl-tab:has-text("${name}")`);
+  await expect(page.locator(`sl-tab:has-text("${name}")`)).toHaveAttribute('selected', '');
+}
+
+async function runAxe(): Promise<AxeResults> {
+  // Storybook's addon-a11y may run axe in the preview; retry while it is busy.
+  let lastError: unknown;
+  for (let i = 0; i < 10; i++) {
+    try {
+      return await axe.analyze();
+    } catch (err) {
+      lastError = err;
+      if (!(err instanceof Error) || !err.message.includes('Axe is already running')) {
+        throw err;
+      }
+      await new Promise(resolve => setTimeout(resolve, 250));
+    }
+  }
+  throw lastError;
+}
+
 test.describe('A11y: Study Companion weekly view tabs', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:6006/?path=/story/examples-study-companion--weekly-view', {
-      waitUntil: 'networkidle'
-    });
+    // Navigate directly to the preview iframe so axe only analyzes the story,
+    // not the Storybook manager UI (which has its own banner and landmarks).
+    await page.goto(STORY_URL, { waitUntil: 'networkidle' });
     axe = new AxeBuilder({ page });
   });
 
-  test.afterEach(async ({ page }) => {
-    if (!results || !results.violations) {
+  test.afterEach(() => {
+    if (!results?.violations) {
       return;
     }
 
@@ -38,26 +58,20 @@ test.describe('A11y: Study Companion weekly view tabs', () => {
   });
 
   test('Today tab panel has no detectable a11y violations', async ({ page }) => {
-    const frame = getPreviewFrame(page);
-    await frame.click('sl-tab:has-text("Today")');
-    await expect(frame.locator('sl-tab:has-text("Today")')).toHaveAttribute('selected', '');
-    results = await axe.analyze();
+    await selectTab(page, 'Today');
+    results = await runAxe();
     expect(results.violations.length, 'Accessibility violations found, see details above').toEqual(0);
   });
 
   test('This week tab panel has no detectable a11y violations', async ({ page }) => {
-    const frame = getPreviewFrame(page);
-    await frame.click('sl-tab:has-text("This week")');
-    await expect(frame.locator('sl-tab:has-text("This week")')).toHaveAttribute('selected', '');
-    results = await axe.analyze();
+    await selectTab(page, 'This week');
+    results = await runAxe();
     expect(results.violations.length, 'Accessibility violations found, see details above').toEqual(0);
   });
 
   test('Later tab panel has no detectable a11y violations', async ({ page }) => {
-    const frame = getPreviewFrame(page);
-    await frame.click('sl-tab:has-text("Later")');
-    await expect(frame.locator('sl-tab:has-text("Later")')).toHaveAttribute('selected', '');
-    results = await axe.analyze();
+    await selectTab(page, 'Later');
+    results = await runAxe();
     expect(results.violations.length, 'Accessibility violations found, see details above').toEqual(0);
   });
 });
