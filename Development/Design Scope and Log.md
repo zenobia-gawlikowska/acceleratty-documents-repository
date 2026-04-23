@@ -59,14 +59,18 @@ Avatar · Icon · Tabs · Overlay (`sl-popover`) · Tooltip
 
 ### Design decisions
 
-| #    | Date       | Decision                                                                           | Rationale                                                                                                                                                            |
-| ---- | ---------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D-01 | 2026-04-22 | Use `sl-panel` instead of `sl-card` for event items                                | No artwork/imagery represents events (test, quiz, essay); `sl-card` media slot would stay empty. `sl-panel` better matches the text-only, list-like nature of tasks. |
-| D-02 | 2026-04-22 | `sl-progress-bar` max width = ⅓ of container                                       | Avoids over-dominating the layout; keeps progress signal compact next to other content.                                                                              |
-| D-03 | 2026-04-22 | `sl-popover` powers quick-add ("New task"), not per-task details                   | Lightweight add flow on mobile; per-task details live inline inside the collapsible task panel — no modal takeover.                                                  |
-| D-04 | 2026-04-22 | Subject is encoded with **color + icon + text badge** (never color alone)          | WCAG 1.4.1 Use of Color + neurodivergent clarity.                                                                                                                    |
-| D-05 | 2026-04-22 | Every icon-only control carries `aria-label` + `sl-tooltip` via `aria-describedby` | WCAG 2.2 Target Size + non-visual context.                                                                                                                           |
-| D-06 | 2026-04-22 | Toggle-button pressed state uses a different icon (check) than default             | Required by `sl-toggle-button`; also a clearer on/off signal.                                                                                                        |
+| #    | Date       | Decision                                                                                                        | Rationale                                                                                                                                                            |
+| ---- | ---------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D-01 | 2026-04-22 | Use `sl-panel` instead of `sl-card` for event items                                                             | No artwork/imagery represents events (test, quiz, essay); `sl-card` media slot would stay empty. `sl-panel` better matches the text-only, list-like nature of tasks. |
+| D-02 | 2026-04-22 | `sl-progress-bar` max width = ⅓ of container                                                                    | Avoids over-dominating the layout; keeps progress signal compact next to other content.                                                                              |
+| D-03 | 2026-04-22 | `sl-popover` powers quick-add ("New task"), not per-task details                                                | Lightweight add flow on mobile; per-task details live inline inside the collapsible task panel — no modal takeover.                                                  |
+| D-04 | 2026-04-22 | Subject is encoded with **color + icon + text badge** (never color alone)                                       | WCAG 1.4.1 Use of Color + neurodivergent clarity.                                                                                                                    |
+| D-05 | 2026-04-22 | Every icon-only control carries `aria-label` + `sl-tooltip` via `aria-describedby`                              | WCAG 2.2 Target Size + non-visual context.                                                                                                                           |
+| D-06 | 2026-04-22 | Toggle-button pressed state uses a different icon (check) than default                                          | Required by `sl-toggle-button`; also a clearer on/off signal.                                                                                                        |
+| D-07 | 2026-04-23 | Task panels are **not collapsible**; show full task details inline                                              | Figma frame 821:2537 shows an always-expanded panel; reduces interaction cost and keeps key info visible for neurodivergent users.                                   |
+| D-08 | 2026-04-23 | Single **status badge** (subtle, lg) in the panel `aside` slot, right-aligned                                   | Matches Figma frame; avoids the earlier three-badge stack (subject/priority/status) which crowded the header.                                                        |
+| D-09 | 2026-04-23 | Priority encoded as **pepper emoji** appended to the task title (🌶️🌶️ / 🌶️)                                     | Playful, student-friendly spiciness metaphor; mirrors Figma frame's `Test 🌶️🌶️` title.                                                                               |
+| D-10 | 2026-04-23 | Simplified task body: **subject line + description only**; no per-task progress bar / meta / attach-file action | Reduces cognitive load per task; keeps the card scannable. Detailed progress/attachments can return later in a drill-down view.                                      |
 
 ### Components removed from initial broader recommendation
 
@@ -105,21 +109,19 @@ Tab group: Today / This week / Month (each tab has a Badge count)
   │                    each containing task panels
   └─ Month panel     → out of scope placeholder
 
-Day panel (sl-panel, collapsible)
+Day panel (sl-panel)
   ├─ prefix: Badge (task count)
   ├─ actions: Button (add task for day) + Tooltip
   └─ default: task panels
 
-Task panel (sl-panel, collapsible, elevation="raised")  ← D-01
-  ├─ heading: task title
-  ├─ prefix: Avatar (square) with subject Icon
-  ├─ suffix: Badges (subject color, priority, status)
-  ├─ actions: Button "Start" (primary) + Tooltip
+Task panel (sl-panel, divider)  ← D-01, D-07, mirrors Figma 821:2537
+  ├─ heading: task title + spiciness peppers (priority → D-09)
+  ├─ prefix: sl-icon (subject)
+  ├─ aside:  sl-badge (status, subtle/lg, right-aligned → D-08)
   └─ default:
-        ├─ meta line (due, duration, priority)
-        ├─ Progress bar (per task)
-        ├─ optional note
-        └─ Button-bar: "Attach material" · "Mark as done"
+        ├─ subject line (icon + label)
+        ├─ description / note
+        └─ Button-bar: primary pill "Start"
 ```
 
 ---
@@ -181,3 +183,10 @@ Task panel (sl-panel, collapsible, elevation="raised")  ← D-01
 | 2026-04-22 | D-01 applied: task items switched from `Card` to `Panel`                |
 | 2026-04-22 | D-02 applied: `Progress bar` capped at ⅓ container width                |
 | 2026-04-22 | D-03 applied: `Popover` moved from per-task details to global quick-add |
+| 2026-04-23 | Implemented Figma frame 821:2537 into the weekly view                   |
+| 2026-04-23 | D-07 applied: removed `collapsible` from task and day panels            |
+| 2026-04-23 | D-08 applied: single subtle/lg status badge, right-aligned in `aside`   |
+| 2026-04-23 | D-09 applied: priority shown as pepper emoji in the task title          |
+| 2026-04-23 | D-10 applied: simplified task body (no per-task progress bar / meta)    |
+| 2026-04-23 | Added sample `note` text to every task                                  |
+| 2026-04-23 | Wrapped body + button-bar in a grid to fix narrow-width collision       |
