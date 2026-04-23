@@ -75,3 +75,13 @@ Change of panel element
 
 New component created here:
 https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=869-10301&t=9mUbg34NQE9RlRCg-1
+
+Empty state added
+- no events on any of the days https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=865-3067&t=9mUbg34NQE9RlRCg-1
+
+Welcome message change
+- avatar XL + welcome message change
+- always to be present on this screen
+Changes visible here
+
+https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=873-5462&t=9mUbg34NQE9RlRCg-1
