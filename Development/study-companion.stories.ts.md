@@ -238,16 +238,11 @@ const allEventTypes: Array<{ slug: string; label: string }> = Array.from(
 
 const taskAction = (task: Task) => {
   if (task.status === 'done') return null;
+  const topic = topicOf(task);
   if (task.status === 'in-progress') {
-    return html`
-      <sl-tooltip id=${`tt-continue-${task.id}`} position="top">Pick up where you left off</sl-tooltip>
-      <sl-button fill="link" aria-describedby=${`tt-continue-${task.id}`}>Continue</sl-button>
-    `;
+    return html` <sl-button fill="link" aria-label=${`Continue ${topic}`}>Continue</sl-button> `;
   }
-  return html`
-    <sl-tooltip id=${`tt-start-${task.id}`} position="top">Jump in and start this one</sl-tooltip>
-    <sl-button variant="primary" shape="pill" aria-describedby=${`tt-start-${task.id}`}>Start</sl-button>
-  `;
+  return html` <sl-button variant="primary" shape="pill" aria-label=${`Start ${topic}`}>Start</sl-button> `;
 };
 
 const taskPanel = (task: Task, isoDate: string) => {
@@ -524,9 +519,13 @@ export const WeeklyView: Story = {
           gap: 0.5rem;
           align-items: end;
         }
-        .toolbar-dates > sl-date-field {
+        .toolbar-dates > sl-form-field {
           flex: 1 1 12rem;
           min-inline-size: 10rem;
+        }
+        .toolbar-dates sl-date-field {
+          inline-size: 100%;
+          min-inline-size: 0;
         }
         .toolbar-dates > :last-child {
           display: none;
@@ -711,14 +710,15 @@ export const WeeklyView: Story = {
 
         <div class="dashboard-toolbar">
           <div class="toolbar-search">
-            <sl-search-field
-              label="Search events by subject or description"
-              placeholder="ex. biology"
-              @sl-change=${applyFilters}
-              @keydown=${(e: KeyboardEvent) => {
-                if (e.key === 'Enter') applyFilters(e);
-              }}
-            ></sl-search-field>
+            <sl-form-field label="Search events by subject or description">
+              <sl-search-field
+                placeholder="ex. biology"
+                @sl-change=${applyFilters}
+                @keydown=${(e: KeyboardEvent) => {
+                  if (e.key === 'Enter') applyFilters(e);
+                }}
+              ></sl-search-field>
+            </sl-form-field>
             <sl-button aria-label="Search" variant="primary" fill="outline" @click=${applyFilters}>Search</sl-button>
           </div>
 
@@ -775,8 +775,12 @@ export const WeeklyView: Story = {
           </div>
 
           <div class="toolbar-dates">
-            <sl-date-field label="From date" @sl-change=${applyFilters}></sl-date-field>
-            <sl-date-field label="To date" @sl-change=${applyFilters}></sl-date-field>
+            <sl-form-field label="From date">
+              <sl-date-field @sl-change=${applyFilters}></sl-date-field>
+            </sl-form-field>
+            <sl-form-field label="To date">
+              <sl-date-field @sl-change=${applyFilters}></sl-date-field>
+            </sl-form-field>
             <span aria-hidden="true"></span>
           </div>
         </div>
