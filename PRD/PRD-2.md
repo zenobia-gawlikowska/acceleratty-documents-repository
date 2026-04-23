@@ -109,8 +109,45 @@ A key requirement from the start is digital accessibility compliant with WCAG 2.
 - Icons, illustrations, and typography follow SLDS asset libraries and branding guidelines.
 - Keep the SLDS dependency up to date (within the supported version range) to benefit from accessibility and visual consistency improvements.
 
-## 5. Out of Scope
-- Integrations with e-gradebooks / LMS (automatic assignment import) — later phase.
-- Possibility of adding external (non-Sanoma) educational materials — later phase.
-- Progress bar (visual indicator of task/study completion progress) — later phase.
-- Manual event creation by students (adding custom events/tasks) — later phase.
+## 5. Future Requirements (later phases)
+
+[ ] FUT-01: Self-marking as "Prepared"
+- Allow students to manually mark themselves as prepared for an upcoming event (separate from "Done").
+- The status is user-driven; the app does not infer preparedness automatically.
+
+[ ] FUT-02: Auto-hide completed and past events
+- Once a task is marked as "Done" or a user self-marks as "Prepared" (per FUT-01), the event is removed from the main list.
+- Exam/test events automatically disappear from the list on/after the exam day.
+- Hidden events should still be accessible via a dedicated "Archive" or "History" view for reference.
+
+[ ] FUT-03: Teacher-driven changes visible to students
+- When a teacher reschedules an event, changes its date, or modifies its scope/description, the change is reflected in the student's view.
+- Changed events are highlighted (e.g., badge "Updated") so students immediately notice the difference.
+- Provide a change indicator with details of what changed (date, scope, type).
+
+[ ] FUT-04: Teacher-defined difficulty
+- Event difficulty (easy / medium / hard) is set by the teacher, not the student.
+- Difficulty is imported together with the event (from e-gradebook (e.g., Vulcan) or teacher input) and displayed read-only to students.
+
+[ ] FUT-05: Progress celebration (gamification)
+- When a student reaches 100% completion for a given day/week, show a celebratory animation (e.g., confetti).
+- Respect "prefers-reduced-motion" (per NFR-01) — provide a non-animated visual alternative (e.g., a static celebratory badge, illustration, or success banner).
+- Provide a non-visual alternative so the achievement is perceivable by users who cannot see the animation:
+  - Announce the achievement to assistive technologies via an ARIA live region (e.g., "Well done! You've completed all tasks for today.").
+  - Optionally play a short, non-intrusive success sound; the sound must be user-configurable (on/off) and must not be the only way the achievement is communicated.
+  - Provide a haptic feedback option on supported devices (also user-configurable).
+- All alternatives (animation, static visual, sound, haptics) must be independently toggleable in user preferences and respect system-level accessibility settings.
+- Celebration is purely feedback and does not block any user action.
+
+[ ] FUT-06: Progress bar
+- Visual indicator showing task/study completion progress for the day and/or week.
+- Accessible (proper ARIA semantics, not color-only; per NFR-01).
+
+[ ] FUT-07: Manual event creation
+- Allow students to add custom events/tasks not imported from the e-gradebook (e.g., personal study blocks, extracurricular assignments).
+- Custom events support the same fields as imported ones: subject, event type, date/deadline, description, and (student-assigned) difficulty.
+- Custom events are clearly distinguishable from imported ones.
+
+[ ] FUT-08: External (non-Sanoma) educational materials
+- Allow linking external learning resources (e.g., URLs, documents) to events/tasks.
+- External links open in an accessible manner with clear indication that they lead outside the app.

@@ -107,3 +107,7 @@ https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-i
 Add "all" to filters dropdown, add "reset filters button" to filters panel. 
 Reset button removes all filters added by user
 https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=834-17902&t=7OADhkyGImCYrP3w-11
+
+## Logo change 
+POlease change logo to new one 
+https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=939-55319&t=QUtfV0wGosextrF9-11
