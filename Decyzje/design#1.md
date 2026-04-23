@@ -82,6 +82,7 @@ Empty state added
 Welcome message change
 - avatar XL + welcome message change
 - always to be present on this screen
+- bear in mind that Hello user is a H2, Get ready... is a H1
 Changes visible here
 
 https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=873-5462&t=9mUbg34NQE9RlRCg-1
