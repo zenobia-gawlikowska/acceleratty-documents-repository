@@ -8,7 +8,6 @@ import {
   faFlask,
   faGlobe,
   faPalette,
-  faPaperclip,
   faPlus
 } from '@fortawesome/pro-regular-svg-icons';
 import '@sl-design-system/avatar/register.js';
@@ -40,7 +39,6 @@ Icon.register(
   faFlask,
   faGlobe,
   faPalette,
-  faPaperclip,
   faPlus
 );
 
@@ -97,7 +95,8 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
         durationMin: 45,
         priority: 'normal',
         status: 'todo',
-        progress: 10
+        progress: 10,
+        note: 'Draft a 5-paragraph outline covering the three partitions (1772, 1793, 1795) and their causes.'
       }
     ]
   },
@@ -113,7 +112,8 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
         durationMin: 30,
         priority: 'normal',
         status: 'todo',
-        progress: 0
+        progress: 0,
+        note: 'Go through the organelles deck twice and mark the cards you get wrong for a second pass.'
       }
     ]
   },
@@ -129,7 +129,8 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
         durationMin: 30,
         priority: 'high',
         status: 'todo',
-        progress: 20
+        progress: 20,
+        note: 'Focus on Central and Eastern Europe — those are the ones you keep mixing up.'
       },
       {
         id: 'a1',
@@ -139,7 +140,8 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
         durationMin: 20,
         priority: 'low',
         status: 'done',
-        progress: 100
+        progress: 100,
+        note: 'Portfolio is packed by the door. Don’t forget the sketchbook from last week.'
       }
     ]
   },
@@ -155,7 +157,8 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
         durationMin: 45,
         priority: 'normal',
         status: 'todo',
-        progress: 0
+        progress: 0,
+        note: 'Worksheet from Mr. Nowak — questions 1 to 15, show your working for the tricky ones.'
       }
     ]
   },
@@ -166,68 +169,55 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
   }
 ];
 
-const priorityBadge = (priority: Task['priority']) => {
-  if (priority === 'high') {
-    return html`<sl-badge color="orange" emphasis="bold" size="sm">Do first</sl-badge>`;
-  }
-  if (priority === 'normal') {
-    return html`<sl-badge color="blue" size="sm">Normal</sl-badge>`;
-  }
-  return html`<sl-badge color="neutral" size="sm">Chill</sl-badge>`;
-};
-
+// Status shown as a single subtle large badge in the panel suffix
+// (matches Figma frame node 821:2537).
 const statusBadge = (status: Task['status']) => {
   if (status === 'done') {
-    return html`<sl-badge color="green" size="sm">Done ✓</sl-badge>`;
+    return html`<sl-badge color="green" emphasis="subtle" size="lg">Done</sl-badge>`;
   }
   if (status === 'in-progress') {
-    return html`<sl-badge color="purple" size="sm">Working on it</sl-badge>`;
+    return html`<sl-badge color="purple" emphasis="subtle" size="lg">Working on it</sl-badge>`;
   }
-  return html`<sl-badge color="neutral" size="sm">Not started</sl-badge>`;
+  return html`<sl-badge color="orange" emphasis="subtle" size="lg">To do</sl-badge>`;
+};
+
+// Spiciness = priority. High-priority tasks get peppers appended to their title
+// (matching the Figma frame's "Test 🌶️🌶️" convention).
+const spice = (priority: Task['priority']) => {
+  if (priority === 'high') return ' 🌶️🌶️';
+  if (priority === 'normal') return ' 🌶️';
+  return '';
 };
 
 // Design decision: no artwork/imagery represents an event (test/quiz/essay),
 // so each task is rendered as an sl-panel instead of an sl-card.
+// Layout mirrors the Figma frame `sl-panel-default` (Multitenant materials, 821:2537):
+// icon prefix, title heading, subtle status badge suffix, divider, body with
+// subject line + description, and a primary pill `Start` action in a button-bar.
 const taskPanel = (task: Task) => html`
-  <sl-panel heading=${task.title} elevation="raised" collapsible>
-    <sl-avatar
-      slot="prefix"
-      size="sm"
-      shape="square"
-      style=${`--sl-avatar-background-color: var(--sl-color-palette-${task.subject.color}-100);`}
-    >
-      <sl-icon slot="fallback" name=${task.subject.iconName}></sl-icon>
-    </sl-avatar>
+  <sl-panel heading=${`${task.title}${spice(task.priority)}`} divider>
+    <sl-icon slot="prefix" name=${task.subject.iconName}></sl-icon>
+    <span slot="aside" style="display: flex; justify-content: flex-end;">${statusBadge(task.status)}</span>
 
-    <span slot="suffix" style="display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-      <sl-badge color=${task.subject.color} size="sm">${task.subject.label}</sl-badge>
-      ${priorityBadge(task.priority)} ${statusBadge(task.status)}
-    </span>
+    <div style="display: grid; gap: 1rem;">
+      <div style="display: grid; gap: 0.5rem;">
+        <p style="margin: 0;">
+          <sl-icon name=${task.subject.iconName} style="vertical-align: -0.15em;"></sl-icon>
+          ${task.subject.label}
+        </p>
+        ${task.note ? html`<p style="margin: 0;">${task.note}</p>` : null}
+      </div>
 
-    <sl-tooltip slot="actions" id=${`tt-start-${task.id}`} position="top">Jump in and start this one</sl-tooltip>
-    <sl-button slot="actions" variant="primary" shape="pill" aria-describedby=${`tt-start-${task.id}`}
-      >Let's go</sl-button
-    >
-
-    <div style="display: grid; gap: 0.75rem;">
-      <span style="color: var(--sl-color-foreground-muted); font: var(--sl-text-body-xs);">
-        Due ${task.due} · ${task.durationMin} min · priority: ${task.priority}
-      </span>
-      <sl-progress-bar .value=${task.progress} label="Progress on this task"> ${task.progress}% done </sl-progress-bar>
-      ${task.note ? html`<p style="margin: 0;">${task.note}</p>` : null}
       <sl-button-bar align="end">
-        <sl-button variant="secondary" shape="pill">
-          <sl-icon name="far-paperclip"></sl-icon>
-          Add notes or files
-        </sl-button>
-        <sl-button variant="success" shape="pill">Done!</sl-button>
+        <sl-tooltip id=${`tt-start-${task.id}`} position="top">Jump in and start this one</sl-tooltip>
+        <sl-button variant="primary" shape="pill" aria-describedby=${`tt-start-${task.id}`}>Start</sl-button>
       </sl-button-bar>
     </div>
   </sl-panel>
 `;
 
 const dayPanel = (day: (typeof week)[number]) => html`
-  <sl-panel heading=${`${day.dayLabel} · ${day.dateLabel}`} collapsible>
+  <sl-panel heading=${`${day.dayLabel} · ${day.dateLabel}`}>
     <sl-badge slot="prefix" size="sm" color="neutral">${day.tasks.length}</sl-badge>
     <sl-tooltip slot="actions" id=${`tt-add-${day.dayLabel}`} position="top"
       >Add something for ${day.dayLabel}</sl-tooltip
