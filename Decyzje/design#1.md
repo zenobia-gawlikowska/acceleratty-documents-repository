@@ -14,3 +14,12 @@ https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-i
 Panel design:
 
 https://www.figma.com/design/T4jvleMekvQX7jtT1xn0rP/Multitenant-materials?node-id=821-2537&t=4kQonyzxhIcTMAwJ-1
+
+Subjects icons: 
+- Each subject will have it's own icon representing it 
+🔢 Math
+⌛ ️History
+🧪 Chemistry 
+🌍 Geography
+🏴󠁧󠁢󠁥󠁮󠁧󠁿 English
+🧬 Biology
