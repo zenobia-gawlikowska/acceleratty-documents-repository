@@ -1,25 +1,8 @@
-# Angular Component
-
-**Component:**
-**Module:**
-**Date:** 4/22/2026
-
-
-![screenshot-20260422195238051](/api/file/raw?path=screenshot-20260422195238051.png)
-
-
----
-
-## Overview
-Description of this component's purpose and responsibility.
-
-## Component File
-
-```typescript
 import {
   faBook,
   faCalculator,
   faCalendarDays,
+  faCheck,
   faChevronRight,
   faFilter,
   faFlask,
@@ -32,10 +15,10 @@ import '@sl-design-system/avatar/register.js';
 import '@sl-design-system/badge/register.js';
 import '@sl-design-system/button/register.js';
 import '@sl-design-system/button-bar/register.js';
-import '@sl-design-system/card/register.js';
 import '@sl-design-system/date-field/register.js';
 import { Icon } from '@sl-design-system/icon';
 import '@sl-design-system/icon/register.js';
+import '@sl-design-system/listbox/register.js';
 import '@sl-design-system/panel/register.js';
 import '@sl-design-system/popover/register.js';
 import '@sl-design-system/progress-bar/register.js';
@@ -51,6 +34,7 @@ Icon.register(
   faBook,
   faCalculator,
   faCalendarDays,
+  faCheck,
   faChevronRight,
   faFilter,
   faFlask,
@@ -184,86 +168,75 @@ const week: Array<{ dayLabel: string; dateLabel: string; tasks: Task[] }> = [
 
 const priorityBadge = (priority: Task['priority']) => {
   if (priority === 'high') {
-    return html`<sl-badge color="red" emphasis="bold" size="sm">High priority</sl-badge>`;
+    return html`<sl-badge color="orange" emphasis="bold" size="sm">Do first</sl-badge>`;
   }
   if (priority === 'normal') {
     return html`<sl-badge color="blue" size="sm">Normal</sl-badge>`;
   }
-  return html`<sl-badge color="neutral" size="sm">Low</sl-badge>`;
+  return html`<sl-badge color="neutral" size="sm">Chill</sl-badge>`;
 };
 
 const statusBadge = (status: Task['status']) => {
   if (status === 'done') {
-    return html`<sl-badge color="green" size="sm">Done</sl-badge>`;
+    return html`<sl-badge color="green" size="sm">Done ✓</sl-badge>`;
   }
   if (status === 'in-progress') {
-    return html`<sl-badge color="purple" size="sm">In progress</sl-badge>`;
+    return html`<sl-badge color="purple" size="sm">Working on it</sl-badge>`;
   }
-  return html`<sl-badge color="neutral" size="sm">To do</sl-badge>`;
+  return html`<sl-badge color="neutral" size="sm">Not started</sl-badge>`;
 };
 
-const taskCard = (task: Task) => html`
-  <sl-card orientation="horizontal" style="inline-size: 100%;">
+// Design decision: no artwork/imagery represents an event (test/quiz/essay),
+// so each task is rendered as an sl-panel instead of an sl-card.
+const taskPanel = (task: Task) => html`
+  <sl-panel heading=${task.title} elevation="raised" collapsible>
     <sl-avatar
-      slot="media"
-      size="md"
+      slot="prefix"
+      size="sm"
       shape="square"
       style=${`--sl-avatar-background-color: var(--sl-color-palette-${task.subject.color}-100);`}
     >
       <sl-icon slot="fallback" name=${task.subject.iconName}></sl-icon>
     </sl-avatar>
 
-    <h3 style="margin: 0;">${task.title}</h3>
-
-    <span slot="header" style="display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+    <span slot="suffix" style="display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
       <sl-badge color=${task.subject.color} size="sm">${task.subject.label}</sl-badge>
       ${priorityBadge(task.priority)} ${statusBadge(task.status)}
-      <span style="color: var(--sl-color-foreground-muted); font: var(--sl-text-body-xs);">
-        Due ${task.due} · ${task.durationMin} min
-      </span>
     </span>
 
-    <p slot="body" style="margin: 0;">
-      <sl-progress-bar .value=${task.progress} label="Progress on this task">
-        ${task.progress}% complete
-      </sl-progress-bar>
-    </p>
+    <sl-tooltip slot="actions" id=${`tt-start-${task.id}`} position="top">Jump in and start this one</sl-tooltip>
+    <sl-button slot="actions" variant="primary" shape="pill" aria-describedby=${`tt-start-${task.id}`}
+      >Let's go</sl-button
+    >
 
-    <sl-button-bar slot="actions" align="end">
-      <sl-button
-        id=${`btn-details-${task.id}`}
-        fill="outline"
-        aria-describedby=${`tt-details-${task.id}`}
-        aria-label="Open task details"
-      >
-        <sl-icon name="far-chevron-right"></sl-icon>
-        Details
-      </sl-button>
-      <sl-popover anchor=${`btn-details-${task.id}`} position="bottom-end">
-        <div style="display: grid; gap: 0.5rem; max-inline-size: 280px;">
-          <strong>${task.title}</strong>
-          <span>${task.note ?? 'No additional notes.'}</span>
-          <sl-button-bar>
-            <sl-button variant="primary" size="sm">Start studying</sl-button>
-            <sl-button fill="outline" size="sm">Mark as done</sl-button>
-          </sl-button-bar>
-        </div>
-      </sl-popover>
-      <sl-tooltip id=${`tt-details-${task.id}`} position="top">Show materials and actions</sl-tooltip>
-
-      <sl-button variant="primary">Start</sl-button>
-    </sl-button-bar>
-  </sl-card>
+    <div style="display: grid; gap: 0.75rem;">
+      <span style="color: var(--sl-color-foreground-muted); font: var(--sl-text-body-xs);">
+        Due ${task.due} · ${task.durationMin} min · priority: ${task.priority}
+      </span>
+      <sl-progress-bar .value=${task.progress} label="Progress on this task"> ${task.progress}% done </sl-progress-bar>
+      ${task.note ? html`<p style="margin: 0;">${task.note}</p>` : null}
+      <sl-button-bar align="end">
+        <sl-button variant="secondary" shape="pill">
+          <sl-icon name="far-paperclip"></sl-icon>
+          Add notes or files
+        </sl-button>
+        <sl-button variant="success" shape="pill">Done!</sl-button>
+      </sl-button-bar>
+    </div>
+  </sl-panel>
 `;
 
 const dayPanel = (day: (typeof week)[number]) => html`
   <sl-panel heading=${`${day.dayLabel} · ${day.dateLabel}`} collapsible>
     <sl-badge slot="prefix" size="sm" color="neutral">${day.tasks.length}</sl-badge>
-    <sl-tooltip slot="actions" id=${`tt-add-${day.dayLabel}`} position="top">Add task for ${day.dayLabel}</sl-tooltip>
+    <sl-tooltip slot="actions" id=${`tt-add-${day.dayLabel}`} position="top"
+      >Add something for ${day.dayLabel}</sl-tooltip
+    >
     <sl-button
       slot="actions"
       fill="ghost"
-      aria-label=${`Add task for ${day.dayLabel}`}
+      shape="pill"
+      aria-label=${`Add something for ${day.dayLabel}`}
       aria-describedby=${`tt-add-${day.dayLabel}`}
     >
       <sl-icon name="far-plus"></sl-icon>
@@ -271,7 +244,7 @@ const dayPanel = (day: (typeof week)[number]) => html`
 
     ${day.tasks.length === 0
       ? html`<p style="margin: 0; color: var(--sl-color-foreground-muted);">No tasks planned.</p>`
-      : html`<div style="display: grid; gap: 0.75rem;">${day.tasks.map(taskCard)}</div>`}
+      : html`<div style="display: grid; gap: 0.75rem;">${day.tasks.map(taskPanel)}</div>`}
   </sl-panel>
 `;
 
@@ -287,10 +260,12 @@ export default {
  * - Tabs — switch the time horizon (Today / This week / Month)
  * - Progress bar — weekly preparation summary
  * - Search field + Select + Date picker + Toggle button group — filter & focus the week
- * - Panel — one per day, collapsible so the student sees only what matters right now
- * - Card — one per task, carries Avatar + Icon (subject), Badges (subject / priority / status),
- *   a per-task Progress bar and a Button bar with Button actions
- * - Popover — in-context task details, reachable from the card action
+ * - Panel — two roles:
+ *     1. one per day, collapsible so the student sees only what matters right now
+ *     2. one per task (design decision: no imagery for events → Panel replaces Card),
+ *        carrying Avatar + Icon (subject) in the prefix, Badges (subject / priority / status)
+ *        in the suffix, a primary Start action, and per-task Progress bar + actions inside
+ * - Popover — quick-add popover anchored to the global "New task" button
  * - Tooltip — labels for icon-only controls (WCAG 2.2 target-size & non-visual context)
  */
 export const WeeklyView: Story = {
@@ -330,6 +305,20 @@ export const WeeklyView: Story = {
         display: grid;
         gap: 0.25rem;
       }
+      sl-progress-bar {
+        max-inline-size: 33.3333%;
+      }
+      /* Kid-friendly: rounder panels, softer shadows, chunkier spacing */
+      .study-dashboard sl-panel {
+        --sl-panel-border-radius: 1.25rem;
+        border-radius: 1.25rem;
+        overflow: hidden;
+      }
+      .study-dashboard sl-search-field,
+      .study-dashboard sl-select,
+      .study-dashboard sl-date-field {
+        --sl-input-border-radius: 999px;
+      }
       @media (max-inline-size: 720px) {
         .dashboard-toolbar {
           grid-template-columns: 1fr;
@@ -340,18 +329,31 @@ export const WeeklyView: Story = {
     <div class="study-dashboard">
       <header class="dashboard-header">
         <sl-avatar display-name="Ada Kowalska" size="md"></sl-avatar>
-        <h1>This week</h1>
+        <h1>Hi, Ada — this is your week</h1>
 
-        <sl-tooltip id="tt-add-global" position="bottom">Add a new task</sl-tooltip>
-        <sl-button variant="primary" aria-describedby="tt-add-global">
+        <sl-tooltip id="tt-add-global" position="bottom">Add something new</sl-tooltip>
+        <sl-button id="btn-new-task" variant="primary" shape="pill" size="lg" aria-describedby="tt-add-global">
           <sl-icon name="far-plus"></sl-icon>
-          New task
+          Add something
         </sl-button>
+        <sl-popover anchor="btn-new-task" position="bottom-end">
+          <div style="display: grid; gap: 0.5rem; max-inline-size: 280px;">
+            <strong>What do you want to add?</strong>
+            <sl-search-field aria-label="Task title" placeholder="e.g. Math test on Friday"></sl-search-field>
+            <sl-select aria-label="Subject" placeholder="Which subject?">
+              ${subjects.map(s => html`<sl-option value=${s.key}>${s.label}</sl-option>`)}
+            </sl-select>
+            <sl-date-field aria-label="Due date"></sl-date-field>
+            <sl-button-bar align="end"
+              ><sl-button variant="primary" shape="pill" size="sm">Add it</sl-button></sl-button-bar
+            >
+          </div>
+        </sl-popover>
       </header>
 
-      <section class="week-summary" aria-label="Weekly preparation">
-        <sl-progress-bar .value=${42} label="Weekly preparation">
-          <strong>42% ready</strong> · 5 of 12 tasks done this week
+      <section class="week-summary" aria-label="Your week so far">
+        <sl-progress-bar .value=${42} label="Your week so far">
+          <strong>5 down, 7 to go</strong> · you're doing great 🎯
         </sl-progress-bar>
       </section>
 
@@ -379,33 +381,33 @@ export const WeeklyView: Story = {
             <sl-tooltip id=${`tt-${s.key}`} position="top">Show only ${s.label}</sl-tooltip>
             <sl-toggle-button fill="outline" shape="pill" aria-label=${s.label} aria-describedby=${`tt-${s.key}`}>
               <sl-icon name=${s.iconName} slot="default"></sl-icon>
-              <sl-icon name=${s.iconName} slot="pressed"></sl-icon>
+              <sl-icon name="far-check" slot="pressed"></sl-icon>
             </sl-toggle-button>
           `
         )}
         <sl-tooltip id="tt-more-filters" position="top">More filters (status, priority, duration)</sl-tooltip>
         <sl-toggle-button fill="outline" shape="pill" aria-label="More filters" aria-describedby="tt-more-filters">
           <sl-icon name="far-filter" slot="default"></sl-icon>
-          <sl-icon name="far-filter" slot="pressed"></sl-icon>
+          <sl-icon name="far-check" slot="pressed"></sl-icon>
         </sl-toggle-button>
       </div>
 
       <sl-tab-group>
         <sl-tab>
           Today
-          <sl-badge color="red" size="sm" style="margin-inline-start: 0.25rem;">2</sl-badge>
+          <sl-badge color="orange" size="sm" style="margin-inline-start: 0.25rem;">2</sl-badge>
         </sl-tab>
         <sl-tab selected>
           This week
           <sl-badge color="blue" size="sm" style="margin-inline-start: 0.25rem;">6</sl-badge>
         </sl-tab>
         <sl-tab>
-          Month
+          Later
           <sl-badge color="neutral" size="sm" style="margin-inline-start: 0.25rem;">14</sl-badge>
         </sl-tab>
 
         <sl-tab-panel>
-          <div style="display: grid; gap: 0.75rem;">${week[0].tasks.map(taskCard)}</div>
+          <div style="display: grid; gap: 0.75rem;">${week[0].tasks.map(taskPanel)}</div>
         </sl-tab-panel>
 
         <sl-tab-panel>
@@ -414,31 +416,10 @@ export const WeeklyView: Story = {
 
         <sl-tab-panel>
           <p style="color: var(--sl-color-foreground-muted);">
-            Month view is not part of this user story — see the Today and This week tabs.
+            The "Later" view isn't built yet — check "Today" or "This week" for what's coming up.
           </p>
         </sl-tab-panel>
       </sl-tab-group>
     </div>
   `
 };
-
-```
-
-What the page implements
-User story chosen: *"As a student, I want to see all tasks for the week in a clear view, so I can plan my study time and priorities quickly."*
-
-## Composition of approved components:
-
-
-![screenshot-20260422195658579](/api/file/raw?path=screenshot-20260422195658579.png)
-
-## WCAG 2.2 AA touchpoints covered
-
-All icon-only controls (sl-toggle-button, add-task buttons) carry aria-label + sl-tooltip linked via aria-describedby.
-
-Information never relies on color alone — subject/priority/status each show text + badge color + icon.
-
-Native sl-search-field, sl-select, sl-date-field, sl-tab-group provide keyboard support and screen-reader semantics out of the box.
-Responsive layout: toolbar collapses to a single column at ≤ 720px (mobile-first).
-
-sl-panel collapsible — supports "show me only what matters now" for neurodivergent users.
