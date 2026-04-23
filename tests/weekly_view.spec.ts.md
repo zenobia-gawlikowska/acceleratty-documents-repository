@@ -69,4 +69,21 @@ test('can use search in Study Companion weekly view', async ({ page }) => {
     await expect(weekPanel.locator('sl-panel[data-topic="quadratic-equations"]')).toBeHidden();
     await expect(weekPanel.locator('sl-panel[data-topic="cell-biology"]')).toBeHidden();
   });
+
+  test('can use From date and To date filters', async ({ page }) => {
+    const preview = page.frameLocator('iframe[title="storybook-preview-iframe"]');
+    // Wait for the search input to render
+    await preview.locator('input[label="From date"]').waitFor({ state: 'visible', timeout: 5000 });
+    await preview.locator('input[label="To date"]').waitFor({ state: 'visible', timeout: 5000 });
+    // Type a search query
+    await preview.locator('input[label="From date"]').fill('24-04-2026');
+    await preview.locator('input[label="To date"]').fill('25-04-2026');
+    await preview.getByRole('button', { name: /Search/i }).press('Enter');
+    // Verify search results are visible
+    await expect(preview.getByText('Monday (24.04.2026)')).toBeVisible();
+    await expect(preview.getByText('Tuesday (25.04.2026)')).toBeVisible();
+    await expect(preview.getByText('Wednesday (27.04.2026)')).not.toBeVisible();
+    await expect(preview.getByText('Thursday (28.04.2026)')).not.toBeVisible();
+    await expect(preview.getByText('Friday (29.04.2026)')).not.toBeVisible();
+  });
 });
